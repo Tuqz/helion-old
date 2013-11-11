@@ -1,6 +1,6 @@
 #pragma once
 
-#include "body.hpp"
+#include "body.h"
 #include "converter.hpp"
 
 namespace sim {

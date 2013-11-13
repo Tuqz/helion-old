@@ -10,10 +10,10 @@ namespace sim {
 		Orbit orbit;
 		double mass, radius, aop, lan, anomaly, time;
 		std::string name, orb_desc;
-		Body& central_mass;
+		Body* central_mass;
 		bool Sun;
 		
-		void assign(Body body);
+		Body operator =(Body body);
 
 		double grav_param() const;
 		

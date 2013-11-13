@@ -5,7 +5,7 @@ namespace sim {
 	struct Vector {
 		double x, y, z;
 		double magnitude() const {
-			//Oppa pythag time!
+			//Pythagoras's thereom.
 			return std::sqrt((x * x) + (y * y) + (z * z));
 		}
 		Vector operator +(const Vector& other) const {

@@ -30,7 +30,7 @@ namespace sim {
 		double mean = sqrt(central_mass->grav_param()/(orbit.semimajor * orbit.semimajor * orbit.semimajor)) * (time + delta_t); //Based on Kepler's formula.
 		double eccent_anom = 0;
 		for(int i = 0; i < 10; ++i) {
-			eccent_anom -= ((orbit.eccentricity * sin(eccent_anom))-mean)/(1 - (orbit.eccentricity * cos(eccent_anom)));
+			eccent_anom = eccent_anom - (eccent_anom - (orbit.eccentricity * sin(eccent_anom)) - mean)/(1-(orbit.eccentricity * cos(eccent_anom))); //Newton-Raphson method for f(x) = x - e sin(x) - M
 		}
 		double tan_anom = sqrt((1 + orbit.eccentricity) / (1 - orbit.eccentricity)) * tan(eccent_anom / 2);
 		
@@ -51,6 +51,14 @@ namespace sim {
 		double semilatus = orbit.semimajor * (1 - (orbit.eccentricity * orbit.eccentricity));
 		double distance = semilatus / (1 + (orbit.eccentricity * cos(anomaly)));
 		Vector result = {distance*(cos(lan)*cos(aop+anomaly)-sin(lan)*sin(aop+anomaly)*cos(orbit.inclination)), distance*(sin(lan)*cos(aop+anomaly)+cos(lan)*sin(aop+anomaly)*cos(orbit.inclination)), distance*sin(aop+anomaly)*sin(orbit.inclination)}; //Conversion from perifocal to *centric coordinates.
+		return result;
+	}
+	
+	Vector Body::vel() {
+		double semilatus = orbit.semimajor * (1 - (orbit.eccentricity * orbit.eccentricity));
+		double ang_mom = sqrt(semilatus * central_mass->grav_param());
+		double mu_h = - (central_mass->grav_param())/(ang_mom);
+		Vector result = {mu_h*(cos(lan)*(sin(aop+anomaly)+(orbit.eccentricity*sin(aop))) + sin(lan)*(cos(aop+anomaly)+(orbit.eccentricity*cos(aop)))*cos(orbit.inclination)), mu_h*(sin(lan)*(sin(aop+anomaly)+(orbit.eccentricity*sin(aop))) - cos(lan)*(cos(aop+anomaly) + (orbit.eccentricity*cos(aop)))*cos(orbit.inclination)), -mu_h*(cos(aop+anomaly) + (orbit.eccentricity*cos(aop))*sin(orbit.inclination))};
 		return result;
 	}
 }

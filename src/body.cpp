@@ -50,15 +50,17 @@ namespace sim {
 	Vector Body::pos() {
 		double semilatus = orbit.semimajor * (1 - (orbit.eccentricity * orbit.eccentricity));
 		double distance = semilatus / (1 + (orbit.eccentricity * cos(anomaly)));
-		Vector result = {distance*(cos(lan)*cos(aop+anomaly)-sin(lan)*sin(aop+anomaly)*cos(orbit.inclination)), distance*(sin(lan)*cos(aop+anomaly)+cos(lan)*sin(aop+anomaly)*cos(orbit.inclination)), distance*sin(aop+anomaly)*sin(orbit.inclination)}; //Conversion from perifocal to *centric coordinates.
+		Vector peri_pos = {distance * cos(anomaly), distance * sin(anomaly), 0};
+		Vector R[3] = {{cos(lan)*cos(aop) - sin(lan)*sin(aop)*cos(orbit.inclination), -cos(lan)*sin(aop)-sin(lan)*cos(aop)*cos(orbit.inclination), sin(lan)*sin(orbit.inclination)}, {sin(lan)*cos(aop)+cos(lan)*sin(aop)*cos(orbit.inclination), -sin(lan)*sin(aop)+cos(lan)*cos(aop)*cos(orbit.inclination), -cos(lan)*sin(orbit.inclination)}, {sin(aop)*sin(orbit.inclination), cos(aop)*sin(orbit.inclination), cos(orbit.inclination)}}; //Conversion matrix
+		Vector result = {Vector::dot(R[0], peri_pos), Vector::dot(R[1], peri_pos), Vector::dot(R[2], peri_pos)};; //Matrix multiplying the position vector by the conversion matrix
 		return result;
 	}
 	
 	Vector Body::vel() {
 		double semilatus = orbit.semimajor * (1 - (orbit.eccentricity * orbit.eccentricity));
-		double ang_mom = sqrt(semilatus * central_mass->grav_param());
-		double mu_h = - (central_mass->grav_param())/(ang_mom);
-		Vector result = {mu_h*(cos(lan)*(sin(aop+anomaly)+(orbit.eccentricity*sin(aop))) + sin(lan)*(cos(aop+anomaly)+(orbit.eccentricity*cos(aop)))*cos(orbit.inclination)), mu_h*(sin(lan)*(sin(aop+anomaly)+(orbit.eccentricity*sin(aop))) - cos(lan)*(cos(aop+anomaly) + (orbit.eccentricity*cos(aop)))*cos(orbit.inclination)), -mu_h*(cos(aop+anomaly) + (orbit.eccentricity*cos(aop))*sin(orbit.inclination))};
+		Vector peri_vel = {- sqrt(central_mass->grav_param()/semilatus) * sin(anomaly), sqrt(central_mass->grav_param()/semilatus)*(orbit.eccentricity+cos(anomaly)), 0};
+		Vector R[3] = {{cos(lan)*cos(aop) - sin(lan)*sin(aop)*cos(orbit.inclination), -cos(lan)*sin(aop)-sin(lan)*cos(aop)*cos(orbit.inclination), sin(lan)*sin(orbit.inclination)}, {sin(lan)*cos(aop)+cos(lan)*sin(aop)*cos(orbit.inclination), -sin(lan)*sin(aop)+cos(lan)*cos(aop)*cos(orbit.inclination), -cos(lan)*sin(orbit.inclination)}, {sin(aop)*sin(orbit.inclination), cos(aop)*sin(orbit.inclination), cos(orbit.inclination)}};
+		Vector result = {Vector::dot(R[0], peri_vel), Vector::dot(R[1], peri_vel), Vector::dot(R[2], peri_vel)};
 		return result;
 	}
 }

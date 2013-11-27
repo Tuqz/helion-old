@@ -21,6 +21,10 @@ int main() {
 		render::planet_render(sim::Earth, scale);
 		render::planet_render(sim::Moon, scale);
 		render::planet_render(sim::Mars, scale);
+		render::orbit_render(sim::Mercury, scale);
+		render::orbit_render(sim::Venus, scale);
+		render::orbit_render(sim::Earth, scale);
+		render::orbit_render(sim::Mars, scale);
 		sim::Venus.update(deltat);
 		sim::Mercury.update(deltat);
 		sim::Earth.update(deltat);

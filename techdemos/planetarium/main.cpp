@@ -1,5 +1,6 @@
 #include "../../src/bodies.h"
 #include "../../src/render.h"
+#include "../../src/camera.h"
 #include <GL/glfw.h>
 #include <iostream>
 
@@ -10,7 +11,10 @@ int main() {
 	glfwSetWindowTitle("Planetarium");
 	glfwEnable(GLFW_STICKY_KEYS);
 	glClearColor(0, 0, 0, 0);
-	gluLookAt(0, 0.9, 0, 0, 0, 0, 0, 0, 1);
+
+	render::Camera cam = {{0, 0.5, 0}, {0, 0, 0}, {1, 0, 0}};
+	cam.refresh();
+
 	while(glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS && glfwGetWindowParam(GLFW_OPENED)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		double scale = (5E-12)/1.5;

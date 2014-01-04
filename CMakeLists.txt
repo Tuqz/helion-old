@@ -3,7 +3,7 @@
 # Since: 1/4/2014
 
 # Set up project 
-PROJECT(helion CXX)
+PROJECT(helion C CXX)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # A place for external contributions to go

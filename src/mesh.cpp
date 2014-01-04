@@ -41,7 +41,7 @@ namespace render {
 		return true;
 	}
 	
-	void Mesh::render() {
+	void Mesh::render(double scale, sim::Vector position) {
 		for(int i = 0; i < faces.size(); ++i) {
 			glBegin(GL_TRIANGLES);
 			for(int j = 0; j < 3; ++j) {
@@ -55,9 +55,64 @@ namespace render {
 						vert_no = faces[i].z - 1;
 					}
 				}
-				glVertex3f(verts[vert_no].x, verts[vert_no].y, verts[vert_no].z);
+				glVertex3f(scale*verts[vert_no].x + position.x, scale*verts[vert_no].y+position.y, scale*verts[vert_no].z+position.z);
 			}
 			glEnd(); 
 		}
 	}
+
+	double Mesh::height() {
+		double maximum = 0;
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].z > maximum) {
+				maximum = verts[i].z;
+			}
+		}
+
+		double minimum = maximum;
+
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].z < minimum) {
+				minimum = verts[i].z;
+			}
+		}
+		return maximum - minimum;
+	}
+	
+	double Mesh::width() {
+		double maximum = 0;
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].x > maximum) {
+				maximum = verts[i].x;
+			}
+		}
+
+		double minimum = maximum;
+
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].x < minimum) {
+				minimum = verts[i].x;
+			}
+		}
+		return maximum - minimum;
+	}
+	
+	double Mesh::breadth() {
+		double maximum = 0;
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].y > maximum) {
+				maximum = verts[i].y;
+			}
+		}
+
+		double minimum = maximum;
+
+		for(int i = 0; i < verts.size(); ++i) {
+			if(verts[i].y < minimum) {
+				minimum = verts[i].y;
+			}
+		}
+		return maximum - minimum;
+	}
 }
+

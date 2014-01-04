@@ -7,7 +7,10 @@ namespace render {
 	struct Mesh {
 	public:
 		bool load(const std::string &path);
-		void render();	
+		void render(double scale, sim::Vector position);	
+		double height();
+		double width();
+		double breadth();
 	private:
 		std::vector<sim::Vector> verts;
 		std::vector<sim::Vector> faces;

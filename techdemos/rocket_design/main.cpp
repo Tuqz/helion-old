@@ -21,14 +21,15 @@ int main() {
 	std::string filenames[] = {"pointed", "rounded", "flat", "tall", "short", "toroidal", "standard", "fat", "jet"};
 
 	render::Mesh rocket[3];
-	double height = 0;
+	double scale = 0;
 	for(int i = 0; i < 3; ++i) {
 		if(!rocket[i].load("data/"+(filenames[(i*3)+choices[i]-1])+".obj")) {
 			std::cout<<"Error! Files not loaded correctly.\n";
 			return 1;
 		}
-		height += rocket[i].height();
+		scale += rocket[i].height();
 	}
+	scale = 2/scale;
 
     /* Attempt to initialize GLFW */
 	if (!glfwInit()) {
@@ -55,9 +56,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		double shift = 0;
-		for(int i = 0; i < 3; ++i) {
-			rocket[i].render(2/height, {0, 1 - 0.5*(shift/height) - 0.5*(rocket[i].height()/height), 0});
-			shift += rocket[i].height();
+		for(int i=2; i>=0; i--) {
+			rocket[i].render(scale, {0, -1+shift, 0});
+			shift += scale*rocket[i].height();
 		}
 
 		glfwSwapBuffers(root);

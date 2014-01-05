@@ -1,7 +1,13 @@
 #include <iostream>
 #include <string>
-#include "../../src/mesh.h"
-#include <GL/glfw.h>
+#include <helion/mesh.h>
+#include <GLFW/glfw3.h>
+
+// Needed for thread management
+#include <thread>
+#include <chrono>
+
+
 
 int main() {
 	int choices[3];
@@ -11,7 +17,7 @@ int main() {
 	std::cin >> choices[1];
 	std::cout<<"If you want: a standard size engine, enter 1; a large size engine, enter 2 or a jet engine, enter 3\n";
 	std::cin >> choices[2];
-	
+
 	std::string filenames[] = {"pointed", "rounded", "flat", "tall", "short", "toroidal", "standard", "fat", "jet"};
 
 	render::Mesh rocket[3];
@@ -24,21 +30,35 @@ int main() {
 		height += rocket[i].height();
 	}
 
-	glfwInit();
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-	glfwOpenWindow(800, 600, 0, 0, 0, 0, 32, 0, GLFW_WINDOW);
-	glfwSetWindowTitle("Rocket viewer");
-	
-	while(glfwGetWindowParam(GLFW_OPENED)) {
+    /* Attempt to initialize GLFW */
+	if (!glfwInit()) {
+        exit(EXIT_FAILURE);
+	}
+
+    /* Set any hits we need for our windows */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+
+    /* Windowed mode, no parent window */
+    GLFWwindow* root = glfwCreateWindow(800, 600, "Rocket Designer", NULL, NULL);
+    if (!root) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+
+	while(!glfwWindowShouldClose(root)) {
+        /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+
 		for(int i = 0; i < 3; ++i) {
-			int i = 0;
+            std::cout << "i=" << i << std::endl;
+
 			double shift = 0;
 			for(int j = 0; j < i; ++j) {
 				shift += rocket[j].height();
 			}
 			rocket[i].render(2/height, {0, 1 - 0.5*(shift/height) - 0.5*(rocket[i].height()/height), 0});
 		}
-		glfwSwapBuffers();
+		glfwSwapBuffers(root);
 	}
 	return 0;
 }

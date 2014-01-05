@@ -45,19 +45,21 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+	/* Don't forget to make context current *before* drawing anything! ;) */
+	glfwMakeContextCurrent(root);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 	while(!glfwWindowShouldClose(root)) {
         /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+		glClear(GL_COLOR_BUFFER_BIT);
 
+		double shift = 0;
 		for(int i = 0; i < 3; ++i) {
-            std::cout << "i=" << i << std::endl;
-
-			double shift = 0;
-			for(int j = 0; j < i; ++j) {
-				shift += rocket[j].height();
-			}
 			rocket[i].render(2/height, {0, 1 - 0.5*(shift/height) - 0.5*(rocket[i].height()/height), 0});
+			shift += rocket[i].height();
 		}
+
 		glfwSwapBuffers(root);
 	}
 	return 0;

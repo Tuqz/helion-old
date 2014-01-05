@@ -13,7 +13,7 @@ SET(CMAKE_MODULE_PATH "external/cmake/")
 
 # Setup any local flags we need, like C++11 support
 IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET(CXX11_FLAG "-std=c++11")
+	SET(CXX11_FLAG "-std=c++0x")
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	SET(CXX11_FLAG "-std=c++11")
 ENDIF()
@@ -42,9 +42,6 @@ IF (NOT GLFW_FOUND)
 			# Download Pixar's handly finder script for GLFW3
 			FILE(DOWNLOAD "https://raw.github.com/PixarAnimationStudios/OpenSubdiv/master/cmake/FindGLFW.cmake"
 				"external/cmake/FindGLFW.cmake")
-			# And the progschj's scrpt for GLFW2
-			FILE(DOWNLOAD "https://raw.github.com/progschj/OpenGL-Examples/master/cmake_modules/FindGLFW.cmake"
-				"external/cmake/FindGLFW2.cmake")
 		ENDIF()
 		
 		# Make sure there's a fallback location	
@@ -62,7 +59,9 @@ ENDIF()
 
 SET(LIBHELION_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libhelion/")
 SET(DEFAULT_INCS ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBHELION_INCLUDE_DIR})
-SET(DEFAULT_LIBS ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} "helion-core")
+
+# libhelion MUST come first, since it has unresolved syms that break the linker
+SET(DEFAULT_LIBS "helion-core" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
 # libhelion must come first
 ADD_SUBDIRECTORY(src/libhelion)
 

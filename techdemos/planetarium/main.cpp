@@ -4,6 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+// Needed for thread management
+#include <thread>
+#include <chrono>
+
 int main() {
 
     /* Attempt to initialize GLFW */
@@ -38,6 +42,10 @@ int main() {
 
 	while(glfwGetKey(root, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
         !glfwWindowShouldClose(root)) {
+
+        /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		double scale = (5E-12)/1.5;
 		double deltat = 200000.0/6.0;

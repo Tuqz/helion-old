@@ -30,14 +30,14 @@ int main() {
 	glfwSetWindowTitle("Rocket viewer");
 	
 	while(glfwGetWindowParam(GLFW_OPENED)) {
-		//for(int i = 0; i < 3; ++i) {
+		for(int i = 0; i < 3; ++i) {
 			int i = 0;
 			double shift = 0;
 			for(int j = 0; j < i; ++j) {
 				shift += rocket[j].height();
 			}
 			rocket[i].render(2/height, {0, 1 - 0.5*(shift/height) - 0.5*(rocket[i].height()/height), 0});
-		//}
+		}
 		glfwSwapBuffers();
 	}
 	return 0;

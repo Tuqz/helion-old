@@ -2,11 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <streambuf>
-#include "mesh.h"
+#include "helion/mesh.h"
 
 namespace render {
 	bool Mesh::load(const std::string &path) {
-		std::ifstream file(path);
+		std::ifstream file(path.c_str());
 		if(!file.is_open()) {
 			return false;
 		}
@@ -19,7 +19,7 @@ namespace render {
 				if((line[0] == 'v' && line[1] == ' ') || line[0] == 'f') {
 					std::string parts;
 					std::istringstream ssline(line);
-					ssline >> parts;	
+					ssline >> parts;
 					if(line[0] == 'v') {
 						std::vector<double> vert;
 						for(int i = 1; i <= 3; ++i) {
@@ -40,7 +40,7 @@ namespace render {
 		}
 		return true;
 	}
-	
+
 	void Mesh::render(double scale, sim::Vector position) {
 		for(int i = 0; i < faces.size(); ++i) {
 			glBegin(GL_TRIANGLES);
@@ -57,7 +57,7 @@ namespace render {
 				}
 				glVertex3f(scale*verts[vert_no].x + position.x, scale*verts[vert_no].y+position.y, scale*verts[vert_no].z+position.z);
 			}
-			glEnd(); 
+			glEnd();
 		}
 	}
 
@@ -78,7 +78,7 @@ namespace render {
 		}
 		return maximum - minimum;
 	}
-	
+
 	double Mesh::width() {
 		double maximum = 0;
 		for(int i = 0; i < verts.size(); ++i) {
@@ -96,7 +96,7 @@ namespace render {
 		}
 		return maximum - minimum;
 	}
-	
+
 	double Mesh::breadth() {
 		double maximum = 0;
 		for(int i = 0; i < verts.size(); ++i) {

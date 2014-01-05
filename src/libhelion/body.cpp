@@ -1,4 +1,4 @@
-#include "body.h"
+#include "helion/body.h"
 
 namespace sim {
 	Body Body::operator =(Body body) {
@@ -17,7 +17,7 @@ namespace sim {
 		Sun = body.Sun;
 		return *this;
 	}
-	
+
 	double Body::grav_param() const {
 		return newtons_constant * mass;
 	}
@@ -33,7 +33,7 @@ namespace sim {
 			eccent_anom = eccent_anom - (eccent_anom - (orbit.eccentricity * sin(eccent_anom)) - mean)/(1-(orbit.eccentricity * cos(eccent_anom))); //Newton-Raphson method for f(x) = x - e sin(x) - M
 		}
 		double tan_anom = sqrt((1 + orbit.eccentricity) / (1 - orbit.eccentricity)) * tan(eccent_anom / 2);
-		
+
 		double old_anomaly = anomaly;
 		double old_time = time;
 		anomaly = 2 * atan(tan_anom);
@@ -55,7 +55,7 @@ namespace sim {
 		Vector result = {Vector::dot(R[0], peri_pos), Vector::dot(R[1], peri_pos), Vector::dot(R[2], peri_pos)};; //Matrix multiplying the position vector by the conversion matrix
 		return result;
 	}
-	
+
 	Vector Body::vel() {
 		double semilatus = orbit.semimajor * (1 - (orbit.eccentricity * orbit.eccentricity));
 		Vector peri_vel = {- sqrt(central_mass->grav_param()/semilatus) * sin(anomaly), sqrt(central_mass->grav_param()/semilatus)*(orbit.eccentricity+cos(anomaly)), 0};

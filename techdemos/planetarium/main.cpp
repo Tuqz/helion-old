@@ -1,21 +1,51 @@
-#include "../../src/bodies.h"
-#include "../../src/render.h"
-#include "../../src/camera.h"
-#include <GL/glfw.h>
+#include <helion/bodies.h>
+#include <helion/render.h>
+#include <helion/camera.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 
+// Needed for thread management
+#include <thread>
+#include <chrono>
+
 int main() {
-	glfwInit();
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-	glfwOpenWindow(800, 600, 0, 0, 0, 0, 32, 0, GLFW_WINDOW);
+
+    /* Attempt to initialize GLFW */
+	if (!glfwInit()) {
+        exit(EXIT_FAILURE);
+	}
+
+    /* Old GLFW2 code */
+    #if 0
+	glfwCreateWindow(800, 600, 0, 0, 0, 0, 32, 0, NULL);
 	glfwSetWindowTitle("Planetarium");
 	glfwEnable(GLFW_STICKY_KEYS);
+	#endif // 0
+
+    /* Set any hits we need for our windows */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+
+    /* Windowed mode, no parent window */
+    GLFWwindow* root = glfwCreateWindow(800, 600, "Planetarium", NULL, NULL);
+    if (!root) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+
+    /* Make the context current */
+    glfwMakeContextCurrent(root);
+
 	glClearColor(0, 0, 0, 0);
 
 	render::Camera cam = {{0, 0.5, 0}, {0, 0, 0}, {1, 0, 0}};
 	cam.refresh();
 
-	while(glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS && glfwGetWindowParam(GLFW_OPENED)) {
+	while(glfwGetKey(root, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+        !glfwWindowShouldClose(root)) {
+
+        /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		double scale = (5E-12)/1.5;
 		double deltat = 200000.0/6.0;
@@ -34,7 +64,7 @@ int main() {
 		sim::Earth.update(deltat);
 		sim::Moon.update(deltat);
 		sim::Mars.update(deltat);
-		glfwSwapBuffers();
-	} 
+		glfwSwapBuffers(root);
+	}
 	return 0;
 }

@@ -10,34 +10,29 @@ namespace render {
 		if(!file.is_open()) {
 			return false;
 		}
-		std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		std::istringstream ss(contents);
-		while(!ss.eof()) {
+		while(!file.eof())
+		{
 			std::string line;
-			std::getline(ss, line);
-			if(line.length()) {
-				if((line[0] == 'v' && line[1] == ' ') || line[0] == 'f') {
-					std::string parts;
-					std::istringstream ssline(line);
-					ssline >> parts;
-					if(line[0] == 'v') {
-						std::vector<double> vert;
-						for(int i = 1; i <= 3; ++i) {
-							ssline >> parts;
-							vert.push_back(atof(parts.c_str()));
-						}
-						verts.push_back({vert[0], vert[1], vert[2]});
-					} else {
-						std::vector<int> face;
-						for(int i = 1; i <= 3; ++i) {
-							ssline >> parts;
-							face.push_back(atoi(parts.c_str()));
-						}
-						faces.push_back({double(face[0]), double(face[1]), double(face[2])});
-					}
+			std::getline(file, line);
+			if(line.length())
+			{
+				if((line[0] == 'v' && line[1] == ' ') || line[0] == 'f')
+				{
+					char type;
+					sim::Vector points;
+					std::stringstream ss(line);
+
+					if(!(ss >> type >> points.x >> points.y >> points.z))
+						return false;
+
+					if(type == 'v')
+						verts.push_back(points);
+					else
+						faces.push_back(points);
 				}
 			}
 		}
+		file.close();
 		return true;
 	}
 

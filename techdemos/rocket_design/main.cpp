@@ -49,11 +49,16 @@ int main() {
 	/* Don't forget to make context current *before* drawing anything! ;) */
 	glfwMakeContextCurrent(root);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_CW);
+	glEnable(GL_CULL_FACE);
 
 	while(!glfwWindowShouldClose(root)) {
         /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		double shift = 0;
 		for(int i=2; i>=0; i--) {

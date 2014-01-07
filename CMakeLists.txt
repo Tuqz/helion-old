@@ -54,7 +54,7 @@ IF (NOT GLFW_FOUND)
 	MESSAGE(FATAL_ERROR "GLFW is required to build Helion. Please extract the latest binary release into external/glfw")
 ENDIF()
 
-
+ADD_DEFINITIONS(-ggdb)
 
 
 SET(LIBHELION_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libhelion/")

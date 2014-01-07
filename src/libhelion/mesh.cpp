@@ -16,19 +16,40 @@ namespace render {
 			std::getline(file, line);
 			if(line.length())
 			{
-				if((line[0] == 'v' && line[1] == ' ') || line[0] == 'f')
+				if((line[0] == 'v' && (line[1] == ' ' || line[1] == 'n')) || line[0] == 'f')
 				{
-					char type;
-					sim::Vector points;
+					std::string type;
 					std::stringstream ss(line);
+					ss >> type;
+			
+					if(type != "f") {
+						sim::Vector points;
+						if(!(ss >> points.x >> points.y >> points.z))
+							return false;
 
-					if(!(ss >> type >> points.x >> points.y >> points.z))
-						return false;
-
-					if(type == 'v')
-						verts.push_back(points);
-					else
-						faces.push_back(points);
+						if(type == "v")
+							verts.push_back(points);
+						if(type == "vn") {
+							normals.push_back(points);
+						}
+					} else {
+						std::vector<int> bits;
+						for(int i = 0; i < 3; ++i) {
+							std::string chunk;
+							ss >> chunk;
+							bool slash = false;
+							int j = -1;
+							while(j < chunk.length() && !slash) {
+								j++;
+								if(chunk[j] == '/') {
+									slash = true;
+								}
+							}
+							bits.push_back(atoi(chunk.substr(0, j).c_str()));
+							bits.push_back(atoi(chunk.substr(j+1).c_str()));
+						}
+						faces.push_back(bits);
+					}
 				}
 			}
 		}
@@ -40,16 +61,9 @@ namespace render {
 		for(int i = 0; i < faces.size(); ++i) {
 			glBegin(GL_TRIANGLES);
 			for(int j = 0; j < 3; ++j) {
-				int vert_no = 0;
-				if(j == 0) {
-					vert_no = faces[i].x - 1;
-				} else {
-					if(j == 1) {
-						vert_no = faces[i].y - 1;
-					} else {
-						vert_no = faces[i].z - 1;
-					}
-				}
+				int vert_no = faces[i][2*j]-1;
+				int norm_no = faces[i][(2*j)+1]-1;
+				glNormal3f(normals[norm_no].x, normals[norm_no].y, normals[norm_no].z);
 				glVertex3f(scale*verts[vert_no].x + position.x, scale*verts[vert_no].y+position.y, scale*verts[vert_no].z+position.z);
 			}
 			glEnd();

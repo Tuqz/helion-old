@@ -13,6 +13,7 @@ namespace render {
 		double breadth();
 	private:
 		std::vector<sim::Vector> verts;
-		std::vector<sim::Vector> faces;
+		std::vector<std::vector<int>> faces;
+		std::vector<sim::Vector> normals;
 	};
 }

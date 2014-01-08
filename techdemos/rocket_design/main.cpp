@@ -52,8 +52,10 @@ int main() {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_CW);
+	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
 
 	while(!glfwWindowShouldClose(root)) {
         /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */

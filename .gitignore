@@ -1,0 +1,7 @@
+*.cmake
+*.a
+Makefile
+CMakeFiles/
+CMakeCache.txt
+/techdemos/planetarium/planetarium
+/techdemos/rocket_design/rocket_design

@@ -65,6 +65,7 @@ int main() {
 		sim::Moon.update(deltat);
 		sim::Mars.update(deltat);
 		glfwSwapBuffers(root);
+		glfwPollEvents();
 	}
 	return 0;
 }

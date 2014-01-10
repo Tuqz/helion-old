@@ -62,6 +62,7 @@ int main() {
 		}
 
 		glfwSwapBuffers(root);
+		glfwPollEvents();
 	}
 	return 0;
 }

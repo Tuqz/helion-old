@@ -14,7 +14,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-int main() {
+int main(int argc, char** argv) {
 	int choices[3];
 	std::cout<<"If you want: a pointed cockpit, enter 1; a rounded cockpit, enter 2 or for a flat cockpit, enter 3\n";
 	std::cin >> choices[0];
@@ -25,10 +25,25 @@ int main() {
 
 	std::string filenames[] = {"pointed", "rounded", "flat", "tall", "short", "toroidal", "standard", "fat", "jet"};
 
+	// Find path to binary to detect if we were launched from a different directory
+	// And then use that path assuming the binary is in the correct place (next to data/).
+	char* cpath = argv[0];
+	int n=0;
+	for(int i=0; cpath[i]!='\0'; i++){
+		if (cpath[i]=='/') n=i;
+	}
+	std::string path;
+	if(n>0){
+		cpath[n]='\0';
+		path = cpath;
+	}else{
+		path = ".";
+	}
+
 	render::Mesh rocket[3];
 	double scale = 0;
 	for(int i = 0; i < 3; ++i) {
-		if(!rocket[i].load("data/"+(filenames[(i*3)+choices[i]-1])+".obj")) {
+		if(!rocket[i].load(""+path+"/data/"+(filenames[(i*3)+choices[i]-1])+".obj")) {
 			std::cout<<"Error! Files not loaded correctly.\n";
 			return 1;
 		}
@@ -36,28 +51,28 @@ int main() {
 	}
 	scale = 2/scale;
 
-    /* Attempt to initialize GLFW */
+	// Attempt to initialize GLFW
 	if (!glfwInit()) {
 		exit(EXIT_FAILURE);
 	}
 
-    /* Set any hits we need for our windows */
+	// Set any hits we need for our windows
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 
-    /* Windowed mode, no parent window */
-    GLFWwindow* root = glfwCreateWindow(800, 600, "Rocket Designer", NULL, NULL);
-    if (!root) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+	// Windowed mode, no parent window
+	GLFWwindow* root = glfwCreateWindow(800, 600, "Rocket Designer", NULL, NULL);
+	if (!root) {
+		glfwTerminate();
+		exit(EXIT_FAILURE);
+	}
 
-	/* Don't forget to make context current *before* drawing anything! ;) */
+	// Don't forget to make context current *before* drawing anything! ;)
 	glfwMakeContextCurrent(root);
 	glfwSetKeyCallback(root, key_callback);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	while(!glfwWindowShouldClose(root)) {
-        /* Don't rape the CPU - ~60Hz (we should really be updating on vsync) */
+		// Don't rape the CPU - ~60Hz (we should really be updating on vsync)
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 		glClear(GL_COLOR_BUFFER_BIT);
 

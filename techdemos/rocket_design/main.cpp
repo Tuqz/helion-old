@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 	render::Mesh rocket[3];
 	double scale = 0;
 	for(int i = 0; i < 3; ++i) {
-		if(!rocket[i].load(""+path+"/data/"+(filenames[(i*3)+choices[i]-1])+".obj")) {
+		if(!rocket[i].load(path+"/data/"+(filenames[(i*3)+choices[i]-1])+".obj")) {
 			std::cout<<"Error! Files not loaded correctly.\n";
 			return 1;
 		}

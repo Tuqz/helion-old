@@ -8,6 +8,11 @@
 #include <chrono>
 
 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
 
 int main() {
 	int choices[3];
@@ -33,11 +38,11 @@ int main() {
 
     /* Attempt to initialize GLFW */
 	if (!glfwInit()) {
-        exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 
     /* Set any hits we need for our windows */
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 
     /* Windowed mode, no parent window */
     GLFWwindow* root = glfwCreateWindow(800, 600, "Rocket Designer", NULL, NULL);
@@ -48,6 +53,7 @@ int main() {
 
 	/* Don't forget to make context current *before* drawing anything! ;) */
 	glfwMakeContextCurrent(root);
+	glfwSetKeyCallback(root, key_callback);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	while(!glfwWindowShouldClose(root)) {

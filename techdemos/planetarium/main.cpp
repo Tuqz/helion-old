@@ -8,32 +8,39 @@
 #include <thread>
 #include <chrono>
 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
+
 int main() {
 
-    /* Attempt to initialize GLFW */
+	/* Attempt to initialize GLFW */
 	if (!glfwInit()) {
-        exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 
-    /* Old GLFW2 code */
-    #if 0
+	/* Old GLFW2 code */
+#if 0
 	glfwCreateWindow(800, 600, 0, 0, 0, 0, 32, 0, NULL);
 	glfwSetWindowTitle("Planetarium");
 	glfwEnable(GLFW_STICKY_KEYS);
-	#endif // 0
+#endif // 0
 
-    /* Set any hits we need for our windows */
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	/* Set any hits we need for our windows */
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 
-    /* Windowed mode, no parent window */
-    GLFWwindow* root = glfwCreateWindow(800, 600, "Planetarium", NULL, NULL);
-    if (!root) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+	/* Windowed mode, no parent window */
+	GLFWwindow* root = glfwCreateWindow(800, 600, "Planetarium", NULL, NULL);
+	if (!root) {
+		glfwTerminate();
+		exit(EXIT_FAILURE);
+	}
 
-    /* Make the context current */
-    glfwMakeContextCurrent(root);
+	/* Make the context current */
+	glfwMakeContextCurrent(root);
+	glfwSetKeyCallback(root, key_callback);
 
 	glClearColor(0, 0, 0, 0);
 

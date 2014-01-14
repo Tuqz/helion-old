@@ -80,20 +80,39 @@ namespace sim {
 		orbit.inclination = inclin;
 		
 		Vector an = Vector::cross({0, 0, 1}, normal);
-		if(an.y >= 0) {
-			lan = acos(an.x/an.magnitude());
+		if(an.magnitude() != 0) {
+			if(an.y >= 0) {
+				lan = acos(an.x/an.magnitude());
+			} else {
+				lan = 2*pi - acos(an.x/an.magnitude());
+			}
 		} else {
-			lan = 2*pi - acos(an.x/an.magnitude());
+			lan = 0;
 		}
 		
 		double semilatus = Vector::dot(normal, normal)/central_mass->grav_param();
 		if(position.magnitude() < (position + (velocity * delta_t)).magnitude()) {
-			anomaly = acos(((semilatus/position.magnitude()) - 1)/eccent);
+			if(eccent != 0) {
+				anomaly = acos(((semilatus/position.magnitude()) - 1)/eccent);
+			} else {
+				anomaly = pi/4;
+			}
 		} else {
-			anomaly = 2*pi - acos(((semilatus/position.magnitude()) - 1)/eccent);
+			if(eccent != 0) {
+				anomaly = 2*pi - acos(((semilatus/position.magnitude()) - 1)/eccent);
+			} else {
+				anomaly = -pi/4;
+			}
 		}
-
-		aop = asin(position.z/(position.magnitude() * sin(inclin))) - anomaly;
+		if(sin(inclin) != 0) {
+			aop = asin(position.z/(position.magnitude() * sin(inclin))) - anomaly;
+		} else {
+			if(inclin == 0) {
+				aop = acos(position.x/(position.magnitude())) - anomaly;
+			} else {
+				aop = acos(position.x/(position.magnitude())) + anomaly - pi;
+			}
+		}
 	
 		Vector cur_pos = pos();
 		if(cur_pos.x != position.x && cur_pos.y != position.y && cur_pos.z != position.z) {
@@ -102,10 +121,14 @@ namespace sim {
 				aop += 2*pi;
 			}
 		}
+		double eccent_anom;
+		if(anomaly != pi) {
+			eccent_anom = 2 * atan(tan(0.5 * anomaly) * sqrt((1 - eccent)/(1 + eccent)));
+			double mean_anom = eccent_anom - eccent * sin(eccent_anom);
 
-		double eccent_anom = 2 * atan(tan(0.5 * anomaly) / sqrt((1 + eccent)/(1 - eccent)));
-		double mean_anom = eccent_anom - eccent * sin(eccent_anom);
-
-		time = mean_anom/(sqrt(central_mass->grav_param()/pow(semimajor, 3)));
+			time = mean_anom/(sqrt(central_mass->grav_param()/pow(semimajor, 3)));
+		} else {
+			time = period()/2;
+		}
 	}
 }

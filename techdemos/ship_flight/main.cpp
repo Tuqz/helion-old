@@ -11,19 +11,33 @@
 #include <thread>
 #include <chrono>
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if(action == GLFW_PRESS) {
-		switch (key) {
-			case GLFW_KEY_ESCAPE:
-				glfwSetWindowShouldClose(window, GL_TRUE);
-				break;
-			case GLFW_KEY_W:
-				break;
-			default:
-				break;
+double deltat = 10.0;
+struct keyboard_controller {
+	sim::Ship ship;
+	static keyboard_controller& getInstance() {
+		static keyboard_controller instance;
+		return instance;
+	}
+	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+		getInstance().key_callback_impl(window, key, action);
+	}
+	
+	void key_callback_impl(GLFWwindow* window, int key, int action) {
+		if(action == GLFW_PRESS) {
+			switch (key) {
+				case GLFW_KEY_ESCAPE:
+					glfwSetWindowShouldClose(window, GL_TRUE);
+					break;
+				case GLFW_KEY_W:
+					ship.rotation = ship.vel();
+					ship.accel(10, deltat);
+					break;
+				default:
+					break;
+			}
 		}
 	}
-}
+};
 
 int main() {
 	sim::Body centre;
@@ -35,6 +49,8 @@ int main() {
 	std::vector<sim::Part> empty;
 
 	sim::Ship ship = {&centre, {6371000, 0, 0}, empty, {1, 0, 0}, 0, 0, 0, 0};
+
+	struct keyboard_controller controller = {ship};
 	
 	if(!glfwInit()) {
 		exit(EXIT_FAILURE);
@@ -50,7 +66,7 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(root);
-	glfwSetKeyCallback(root, key_callback);
+	glfwSetKeyCallback(root, controller.key_callback);
 
 	glClearColor(0, 0, 0, 0);
 
@@ -59,13 +75,12 @@ int main() {
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		double scale = 1.081E-8;
-		double deltat = 10.0;
 
 		render::planet_render(centre, scale);
-		render::ship_render(ship, scale);
-		render::orbit_render(ship, scale);
+		render::ship_render(controller.ship, scale);
+		render::orbit_render(controller.ship, scale);
 
-		ship.update(deltat);
+		controller.ship.update(deltat);
 
 		glfwSwapBuffers(root);
 		glfwPollEvents();

@@ -65,4 +65,47 @@ namespace sim {
 		Vector result = {Vector::dot(R[0], peri_vel), Vector::dot(R[1], peri_vel), Vector::dot(R[2], peri_vel)};
 		return result;
 	}
+
+	void Ship::accel(double thrust, double delta_t) {
+		Vector position = pos();
+		Vector velocity = vel();
+		velocity = velocity + (rotation * thrust * delta_t);
+		Vector normal = Vector::cross(position, velocity);
+		double inclin = Vector::dot(normal, {0, 0, 1})/normal.magnitude();
+		double energy = (0.5 * Vector::dot(velocity, velocity)) - (central_mass->grav_param()/position.magnitude());
+		double semimajor = -(central_mass->grav_param())/(2 * energy);
+		double eccent = sqrt(1 + (2 * energy * Vector::dot(normal, normal))/(central_mass->grav_param() * central_mass->grav_param()));
+		orbit.semimajor = semimajor;
+		orbit.eccentricity = eccent;
+		orbit.inclination = inclin;
+		
+		Vector an = Vector::cross({0, 0, 1}, normal);
+		if(an.y >= 0) {
+			lan = acos(an.x/an.magnitude());
+		} else {
+			lan = 2*pi - acos(an.x/an.magnitude());
+		}
+		
+		double semilatus = Vector::dot(normal, normal)/central_mass->grav_param();
+		if(position.magnitude() < (position + (velocity * delta_t)).magnitude()) {
+			anomaly = acos(((semilatus/position.magnitude()) - 1)/eccent);
+		} else {
+			anomaly = 2*pi - acos(((semilatus/position.magnitude()) - 1)/eccent);
+		}
+
+		aop = asin(position.z/(position.magnitude() * sin(inclin))) - anomaly;
+	
+		Vector cur_pos = pos();
+		if(cur_pos.x != position.x && cur_pos.y != position.y && cur_pos.z != position.z) {
+			aop = pi - aop;
+			if(aop < 0) {
+				aop += 2*pi;
+			}
+		}
+
+		double eccent_anom = 2 * atan(tan(0.5 * anomaly) / sqrt((1 + eccent)/(1 - eccent)));
+		double mean_anom = eccent_anom - eccent * sin(eccent_anom);
+
+		time = mean_anom/(sqrt(central_mass->grav_param()/pow(semimajor, 3)));
+	}
 }

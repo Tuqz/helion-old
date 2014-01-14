@@ -18,5 +18,6 @@ namespace sim {
 		void update(double delta_t);
 		Vector pos();
 		Vector vel();
+		void accel(double thrust, double delta_t);
 	};	
 }

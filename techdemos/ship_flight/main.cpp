@@ -30,6 +30,7 @@ struct keyboard_controller {
 					break;
 				case GLFW_KEY_W:
 					ship.rotation = ship.vel();
+					ship.rotation = ship.rotation * (1.0/ship.rotation.magnitude());
 					ship.accel(10, deltat);
 					break;
 				default:

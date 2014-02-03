@@ -1,4 +1,3 @@
-#include <iostream>
 #include "heliocentric/hcgame.hpp"
 
 using namespace std;

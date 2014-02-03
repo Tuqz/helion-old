@@ -1,4 +1,4 @@
-#include "heliocentric/hcgame.h"
+#include "heliocentric/hcgame.hpp"
 
 using namespace std;
 

@@ -59,9 +59,10 @@ SET(LIBHELIOCENTRIC_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libheliocentric/")
 SET(DEFAULT_INCS ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBHELION_INCLUDE_DIR} ${LIBHELIOCENTRIC_INCLUDE_DIR})
 
 # libhelion MUST come first, since it has unresolved syms that break the linker
-SET(DEFAULT_LIBS "helion-core" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
+SET(DEFAULT_LIBS "helion-core" "heliocentric" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
 # libhelion must come first
 ADD_SUBDIRECTORY(src/libhelion)
+ADD_SUBDIRECTORY(src/libheliocentric)
 
 # Check to see if we are building tech demos
 IF(BUILD_TECH_DEMOS)

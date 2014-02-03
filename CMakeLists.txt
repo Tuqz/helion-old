@@ -37,16 +37,15 @@ ENDIF()
 
 # See if we can find glfw
 IF (NOT GLFW_FOUND)
+	IF (NOT EXISTS "external/cmake/FindGLFW.cmake")
+		# Download Pixar's handly finder script for GLFW3
+		FILE(DOWNLOAD "https://raw.github.com/PixarAnimationStudios/OpenSubdiv/master/cmake/FindGLFW.cmake"
+			"external/cmake/FindGLFW.cmake")
+	ENDIF()
 	
-		IF (NOT EXISTS "external/cmake/FindGLFW.cmake")
-			# Download Pixar's handly finder script for GLFW3
-			FILE(DOWNLOAD "https://raw.github.com/PixarAnimationStudios/OpenSubdiv/master/cmake/FindGLFW.cmake"
-				"external/cmake/FindGLFW.cmake")
-		ENDIF()
-		
-		# Make sure there's a fallback location	
-		SET(GLFW_LOCATION "${PROJECT_SOURCE_DIR}/external/glfw")
-		find_package(GLFW)
+	# Make sure there's a fallback location	
+	SET(GLFW_LOCATION "${PROJECT_SOURCE_DIR}/external/glfw")
+	find_package(GLFW)
 ENDIF()
 
 # Must have GLFW
@@ -54,11 +53,10 @@ IF (NOT GLFW_FOUND)
 	MESSAGE(FATAL_ERROR "GLFW is required to build Helion. Please extract the latest binary release into external/glfw")
 ENDIF()
 
-
-
-
+# Includes
 SET(LIBHELION_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libhelion/")
-SET(DEFAULT_INCS ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBHELION_INCLUDE_DIR})
+SET(LIBHELIOCENTRIC_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libheliocentric/")
+SET(DEFAULT_INCS ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBHELION_INCLUDE_DIR} ${LIBHELIOCENTRIC_INCLUDE_DIR})
 
 # libhelion MUST come first, since it has unresolved syms that break the linker
 SET(DEFAULT_LIBS "helion-core" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
@@ -71,4 +69,5 @@ IF(BUILD_TECH_DEMOS)
 	ADD_SUBDIRECTORY(techdemos/planetarium)
 	ADD_SUBDIRECTORY(techdemos/rocket_design)
 	ADD_SUBDIRECTORY(techdemos/ship_flight)
+	ADD_SUBDIRECTORY(techdemos/engine_test)
 ENDIF()

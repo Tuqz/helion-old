@@ -12,6 +12,7 @@ Since 1/4/2014, efforts have been made to make Helion portable. Right now, you c
 * Some OpenGL implementation
 * libglu
 * libglfw
+* libglm
 
 You will also need to download Kitware's CMake build system (http://www.cmake.org). This will let you generate the files for your preferred build environment. If you want to use the default, simply issue the following command:
 
@@ -22,3 +23,7 @@ Note that on Windows, multiple generators are available by default. Windows user
 $ cmake . -G "CodeBlocks - MinGW Makefiles" -DCMAKE_CXX_COMPILER=g++
 
 Tech demos are built optionally if you supply "-DBUILD_TECH_DEMOS=true" to that command. Once you run this the first time, you just need to do "cmake ." to update the makefiles.
+
+Pro tip: to get an out-of-source build, run from a subdirectory:
+
+$ cmake .. -DBUILD_TECH_DEMOS=true

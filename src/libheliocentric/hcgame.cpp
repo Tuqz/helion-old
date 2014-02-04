@@ -21,31 +21,57 @@ void exitHeliocentric() {
 	glfwTerminate();
 }
 
+bool glversion(int major, int minor) {
+	int actualMajor, actualMinor;
+	glGetIntegerv(GL_MAJOR_VERSION, &actualMajor);
+	glGetIntegerv(GL_MINOR_VERSION, &actualMinor);
+	if (major < actualMajor) {
+		return false;
+	}
+	if (major > actualMajor) {
+		return true;
+	}
+	if (minor < actualMinor) {
+		return false;
+	}
+	return true;
+}
+
 // Callback functions
 
 void cb_resized(GLFWwindow* window, int width, int height) {
-	HCGame* wrapper = static_cast<HCGame*>(glfwGetWindowUserPointer(window));
+	HcGame* wrapper = static_cast<HcGame*>(glfwGetWindowUserPointer(window));
 	wrapper->resized(width, height);
 }
 
 void cb_closed(GLFWwindow* window) {
-	HCGame* wrapper = static_cast<HCGame*>(glfwGetWindowUserPointer(window));
+	HcGame* wrapper = static_cast<HcGame*>(glfwGetWindowUserPointer(window));
 	cout << "cb_closed" << endl;
 	wrapper->closed();
 }
 
 // HCGame implementation
 
-HCGame::HCGame(int width, int height, string title, bool resizable) : title(title), fps(0) {
+HcGame::HcGame(int width, int height, string title, bool resizable) : title(title), fps(0) {
 	
 	// Create the window and context
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
-	window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+	GLFWmonitor* fullscreenMonitor = NULL;
+//	if (fullscreen) {
+//		fullscreenMonitor = glfwGetPrimaryMonitor();
+//	}
+	window = glfwCreateWindow(width, height, title.c_str(), fullscreenMonitor, NULL);
 	if (!window) {
 		glfwTerminate();
 		exit(1);
 	}
 	glfwMakeContextCurrent(window);
+	
+	// Print OpenGL version
+	int major, minor;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	cout << "OpenGL version: " << major << "." << minor << endl;
 	
 	// Set up callbacks
 	glfwSetWindowUserPointer(window, this);
@@ -53,7 +79,7 @@ HCGame::HCGame(int width, int height, string title, bool resizable) : title(titl
 	glfwSetWindowCloseCallback(window, cb_closed);
 }
 
-void HCGame::run() {
+void HcGame::run() {
 	// Initalize prevTime and prevCalcTime
 	getDelta();
 	prevCalcTime = getTime();
@@ -86,50 +112,47 @@ void HCGame::run() {
 	shutdown();
 }
 
-void HCGame::shutdown() {
+void HcGame::shutdown() {
 	glfwDestroyWindow(window);
 	exit(0);
 }
 
-bool HCGame::shouldStop() {
+bool HcGame::shouldStop() {
 	return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
 }
 
 // Display management
 
-void HCGame::closed() {
-	// Intentionally left empty, so I can serve as a hook.
+void HcGame::closed() {
+	//TODO only called when pressing the x button
+	// Intentionally left empty, so it can serve as a hook.
 }
 
-void HCGame::resized() {
+void HcGame::resized() {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	resized(width, height);
 }
 
-void HCGame::resized(int width, int height) {
+void HcGame::resized(int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void HCGame::setDisplayMode() {
-	//TODO
-}
-
-void HCGame::setTitle(string title) {
+void HcGame::setTitle(string title) {
 	this->title = title;
 }
 
-string HCGame::getTitle() {
+string HcGame::getTitle() {
 	return title;
 }
 
 // Time management
 
-double HCGame::getTime() {
+double HcGame::getTime() {
 	return glfwGetTime();
 }
 
-double HCGame::getDelta() {
+double HcGame::getDelta() {
 	double time = getTime();
 	double delta = time - prevTime;
 	prevTime = time;
@@ -137,7 +160,7 @@ double HCGame::getDelta() {
 	return delta;
 }
 
-void HCGame::updateFPS() {
+void HcGame::updateFPS() {
 	if (getTime() - prevCalcTime > 1) {
 		glfwSetWindowTitle(window, (title + " - FPS: " + to_string(fps)).c_str());
 		fps = 0;

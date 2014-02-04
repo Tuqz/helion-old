@@ -1,14 +1,14 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
-class HCGame {
+class HcGame {
 private:
 	std::string title;
 	double prevTime, prevCalcTime;
 	int fps;
 	GLFWwindow* window;
 public:
-	HCGame(int width, int height, std::string title, bool resizable);
+	HcGame(int width, int height, std::string title, bool resizable);
 	// Game loop management
 	void run();
 	void shutdown();
@@ -35,3 +35,4 @@ private:
 
 int initHeliocentric();
 void exitHeliocentric();
+bool glversion(int major, int minor);

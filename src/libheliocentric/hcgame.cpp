@@ -9,7 +9,7 @@ using namespace std;
 // Static functions
 
 void glfwErrorCallback(int error, const char* description) {
-	cerr << "GLFW encoutered error: " << error << " - " << description << endl;
+	cerr << "GLFW encountered error: " << error << " - " << description << endl;
 }
 
 int initHeliocentric() {
@@ -40,12 +40,12 @@ bool glversion(int major, int minor) {
 // Callback functions
 
 void cb_resized(GLFWwindow* window, int width, int height) {
-	HcGame* wrapper = static_cast<HcGame*>(glfwGetWindowUserPointer(window));
+	HcGame* wrapper = static_cast<HcGame*> (glfwGetWindowUserPointer(window));
 	wrapper->resized(width, height);
 }
 
 void cb_closed(GLFWwindow* window) {
-	HcGame* wrapper = static_cast<HcGame*>(glfwGetWindowUserPointer(window));
+	HcGame* wrapper = static_cast<HcGame*> (glfwGetWindowUserPointer(window));
 	cout << "cb_closed" << endl;
 	wrapper->closed();
 }
@@ -53,26 +53,30 @@ void cb_closed(GLFWwindow* window) {
 // HCGame implementation
 
 HcGame::HcGame(int width, int height, string title, bool resizable) : title(title), fps(0) {
-	
+
 	// Create the window and context
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
 	GLFWmonitor* fullscreenMonitor = NULL;
-//	if (fullscreen) {
-//		fullscreenMonitor = glfwGetPrimaryMonitor();
-//	}
+	//	if (fullscreen) {
+	//		fullscreenMonitor = glfwGetPrimaryMonitor();
+	//	}
 	window = glfwCreateWindow(width, height, title.c_str(), fullscreenMonitor, NULL);
 	if (!window) {
-		glfwTerminate();
-		exit(1);
+		shutdown();
 	}
 	glfwMakeContextCurrent(window);
-	
+
 	// Print OpenGL version
 	int major, minor;
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	cout << "OpenGL version: " << major << "." << minor << endl;
 	
+	GLenum res = glewInit();
+	if (res != GLEW_OK) {
+		shutdown();
+	}
+
 	// Set up callbacks
 	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, cb_resized);
@@ -89,7 +93,8 @@ void HcGame::run() {
 
 	// Initialization
 	init();
-
+	
+	float sleepTime;
 	while (!shouldStop()) {
 
 		// Update the game state
@@ -106,14 +111,18 @@ void HcGame::run() {
 		updateFPS();
 
 		// Cap fps to 60fps
-		usleep(16667); //TODO Fix to be calculated or to vsync
+		//TODO vsync
+		sleepTime = 1.0f / 60 - (getTime() - prevTime);
+		usleep((int)(sleepTime*1000000)); 
+		glfwPollEvents();
 	}
 
 	shutdown();
 }
 
-void HcGame::shutdown() {
+void HcGame::shutdown() { //TODO improve!!!
 	glfwDestroyWindow(window);
+	exitHeliocentric();
 	exit(0);
 }
 

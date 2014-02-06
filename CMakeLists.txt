@@ -53,13 +53,18 @@ IF (NOT GLFW_FOUND)
 	MESSAGE(FATAL_ERROR "GLFW is required to build Helion. Please extract the latest binary release into external/glfw")
 ENDIF()
 
+#GLEW libraries hack
+add_library(glew_static STATIC IMPORTED)
+set_target_properties(glew_static PROPERTIES
+    IMPORTED_LOCATION ${GLEW_LIBRARY})
+
 # Includes
 SET(LIBHELION_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libhelion/")
 SET(LIBHELIOCENTRIC_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/libheliocentric/")
 SET(DEFAULT_INCS ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBHELION_INCLUDE_DIR} ${LIBHELIOCENTRIC_INCLUDE_DIR})
 
 # libhelion MUST come first, since it has unresolved syms that break the linker
-SET(DEFAULT_LIBS "helion-core" "heliocentric" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES})
+SET(DEFAULT_LIBS "helion-core" "heliocentric" ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} glew_static)
 # libhelion must come first
 ADD_SUBDIRECTORY(src/libhelion)
 ADD_SUBDIRECTORY(src/libheliocentric)

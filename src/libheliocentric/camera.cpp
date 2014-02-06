@@ -4,18 +4,9 @@
 using namespace std;
 
 Camera::Camera(float zNear, float zFar, float frustumScale) : worldToCamera(), cameraToClip(0.0f) {
-	const float *values = (const float*) glm::value_ptr(cameraToClip);
-	cout << endl;
 	setRanges(zNear, zFar);
 	setFrustumScale(frustumScale);
-	cameraToClip[3][3] = -1;
-	for (int r = 0; r < 4; ++r) {
-		for (int c = 0; c < 4; ++c) {
-			cout << values[r + 4 * c] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
+	cameraToClip[2][3] = -1;
 }
 
 mat4 Camera::getWorldToClipMatrix() {

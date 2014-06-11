@@ -6,8 +6,8 @@ class HcGame3D : public HcGame{
 private:
 	Camera& camera;
 public:
-	HcGame3D(int width, int height, std::string title, bool resizable, Camera& camera);
-	virtual void resized();
+	HcGame3D(int width, int height, std::string title, bool resizable, bool fullscreen, Camera& camera);
+	virtual void resized(int width, int height);
 	Camera& getCamera();
 	void setCamera(Camera& camera);
 protected:

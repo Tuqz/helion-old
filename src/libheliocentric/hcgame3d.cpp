@@ -2,17 +2,18 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <unistd.h>
+
+//#define super HcGame;
 
 using namespace std;
 
-HcGame3D::HcGame3D(int width, int height, string title, bool resizable, Camera& camera)
-		: camera(camera), HcGame(width, height, title, resizable) {
+HcGame3D::HcGame3D(int width, int height, string title, bool resizable, bool fullscreen, Camera& camera)
+		: camera(camera), HcGame(width, height, title, resizable, fullscreen) {
 }
 
-void HcGame3D::resized() {
-	HcGame::resized();
-	camera.updateAspect();
+void HcGame3D::resized(int width, int height) {
+	HcGame::resized(width, height);
+	camera.updateAspect(width, height);
 }
 
 void HcGame3D::init() {

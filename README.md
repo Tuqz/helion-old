@@ -13,6 +13,7 @@ Since 1/4/2014, efforts have been made to make Helion portable. Right now, you c
 * libglu
 * libglfw
 * libglm
+* libglew
 
 You will also need to download Kitware's CMake build system (http://www.cmake.org). This will let you generate the files for your preferred build environment. If you want to use the default, simply issue the following command:
 

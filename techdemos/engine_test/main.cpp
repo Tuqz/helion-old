@@ -1,188 +1,164 @@
 #include "heliocentric/hcgame3d.hpp"
 #include "heliocentric/shaders.hpp"
+#include "heliocentric/mesh.hpp"
 #include <glm/gtc/matrix_transform.hpp> 
 #include <iostream>
+#include <unistd.h>
 
 #define super HcGame3D
 
 using namespace std;
 
 void printMatrix(mat4 matrix) {
-	const float *values = (const float*) glm::value_ptr(matrix);
-	for (int r = 0; r < 4; ++r) {
-		for (int c = 0; c < 4; ++c) {
-			cout << values[r + 4 * c] << " ";
-		}
-		cout << endl;
-	}
+    const float *values = (const float*) glm::value_ptr(matrix);
+    for (int r = 0; r < 4; ++r) {
+        for (int c = 0; c < 4; ++c) {
+            cout << values[r + 4 * c] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void printVector(vec3 vector) {
+    cout << "pos = (" << vector.x << ", " << vector.y << ", " << vector.z << ")" << endl;
 }
 
 class EngineTest : public HcGame3D {
 private:
-	bool print = true;
-	GLuint program, vao, vbo;
-	GLuint modelToCameraUniform, cameraToClipUniform;
+    GLuint program, vao;
+    GLuint modelToCameraUniform, cameraToClipUniform, sunPositionUniform;
+    Mesh mesh;
+
 public:
+    EngineTest(int width, int height, string title, bool resizable,
+            bool fullscreen, Camera& camera)
+            : HcGame3D(width, height, title, resizable, fullscreen, camera) {
+    }
 
-	EngineTest(int width, int height, string title, bool resizable, Camera& camera)
-			: HcGame3D(width, height, title, resizable, camera) {
-	}
+    void init() {
+        glfwPollEvents();
+        super::init();
 
-	void init() {
-		super::init();
-		float vertexData[] = {
-			0.25f, 0.25f, -1.25f, 1.0f,
-			0.25f, -0.25f, -1.25f, 1.0f,
-			-0.25f, 0.25f, -1.25f, 1.0f,
+        // Load the mesh
+        mesh.load("data/meshes/cube.obj");
 
-			0.25f, -0.25f, -1.25f, 1.0f,
-			-0.25f, -0.25f, -1.25f, 1.0f,
-			-0.25f, 0.25f, -1.25f, 1.0f,
+        // Create shader program
+        ShaderProgram sp("data/shaders/simple.vert", "data/shaders/simple.frag");
+        program = sp.getProgram();
+        // Transform matrix uniforms
+        modelToCameraUniform = sp.getUniformLocation("modelToCameraMatrix");
+        cameraToClipUniform = sp.getUniformLocation("cameraToClipMatrix");
+        // Lighting uniforms
+        sunPositionUniform = sp.getUniformLocation("sunPosition");
+        glUseProgram(program);
+        GLint u;
+        u = sp.getUniformLocation("sunIntensity");
+        glUniform4f(u, 0.9f, 0.9f, 0.9f, 1);
+        u = sp.getUniformLocation("ambientIntensity");
+        glUniform4f(u, 0.1f, 0.1f, 0.1f, 1);
+        u = sp.getUniformLocation("diffuseColor");
+        glUniform4f(u, 1, 1, 1, 1);
+        u = sp.getUniformLocation("attenuationFactor");
+        glUniform1f(u, 1);
+        glUseProgram(0);
 
-			0.25f, 0.25f, -2.75f, 1.0f,
-			-0.25f, 0.25f, -2.75f, 1.0f,
-			0.25f, -0.25f, -2.75f, 1.0f,
+        // Create vertex array
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
 
-			0.25f, -0.25f, -2.75f, 1.0f,
-			-0.25f, 0.25f, -2.75f, 1.0f,
-			-0.25f, -0.25f, -2.75f, 1.0f,
+        // Grab the mouse to control the camera
+        grabMouse();
+    }
 
-			-0.25f, 0.25f, -1.25f, 1.0f,
-			-0.25f, -0.25f, -1.25f, 1.0f,
-			-0.25f, -0.25f, -2.75f, 1.0f,
+    void update(double delta) {
+        float speed = 0.025;
+        float rotspeed = 0.0025;
+        float scrollrotspeed = 0.1;
+        if (keyPressed(GLFW_KEY_W)) {
+            //            cout << "W" << endl;
+            getCamera().moveRelative(0, 0, -speed);
+        }
+        if (keyPressed(GLFW_KEY_S)) {
+            //            cout << "S" << endl;
+            getCamera().moveRelative(0, 0, speed);
+        }
+        if (keyPressed(GLFW_KEY_A)) {
+            //            cout << "A" << endl;
+            getCamera().moveRelative(-speed, 0, 0);
+        }
+        if (keyPressed(GLFW_KEY_D)) {
+            //            cout << "D" << endl;
+            getCamera().moveRelative(speed, 0, 0);
+        }
+        if (keyPressed(GLFW_KEY_Q)) {
+            //            cout << "Q" << endl;
+            getCamera().moveRelative(0, speed, 0);
+        }
+        if (keyPressed(GLFW_KEY_E)) {
+            //            cout << "E" << endl;
+            getCamera().moveRelative(0, -speed, 0);
+        }
+        if (keyPressed(GLFW_KEY_Z)) {
+            //            cout << "Z" << endl;
+            getCamera().moveRelative(0, -speed, 0);
+        }
+        if (keyPressed(GLFW_KEY_UP)) {
+            //            cout << "Up" << endl;
+            getCamera().tilt(rotspeed * 1);
+        }
+        if (keyPressed(GLFW_KEY_DOWN)) {
+            //            cout << "Down" << endl;
+            getCamera().tilt(rotspeed * -1);
+        }
+        if (keyPressed(GLFW_KEY_LEFT)) {
+            //            cout << "Left" << endl;
+            getCamera().pan(rotspeed * -1);
+        }
+        if (keyPressed(GLFW_KEY_RIGHT)) {
+            //            cout << "Right" << endl;
+            getCamera().pan(rotspeed * 1);
+        }
+        double dx, dy;
+        getMouseMotion(&dx, &dy);
+        getCamera().pan(rotspeed * dx);
+        getCamera().tilt(rotspeed * -dy);
+        getCamera().roll(scrollrotspeed * getScrollDY());
+    }
 
-			-0.25f, 0.25f, -1.25f, 1.0f,
-			-0.25f, -0.25f, -2.75f, 1.0f,
-			-0.25f, 0.25f, -2.75f, 1.0f,
+    void renderWorld(mat4 base) {
+        glUseProgram(program);
 
-			0.25f, 0.25f, -1.25f, 1.0f,
-			0.25f, -0.25f, -2.75f, 1.0f,
-			0.25f, -0.25f, -1.25f, 1.0f,
+        vec4 sunCameraPosition = base * vec4(0, 0, 0, 1);
+        glUniform3f(sunPositionUniform, sunCameraPosition.x, sunCameraPosition.y, sunCameraPosition.z);
+        glUniformMatrix4fv(modelToCameraUniform, 1, GL_FALSE, glm::value_ptr(glm::translate(base, vec3(-1, 0, -2))));
 
-			0.25f, 0.25f, -1.25f, 1.0f,
-			0.25f, 0.25f, -2.75f, 1.0f,
-			0.25f, -0.25f, -2.75f, 1.0f,
+        mesh.render();
 
-			0.25f, 0.25f, -2.75f, 1.0f,
-			0.25f, 0.25f, -1.25f, 1.0f,
-			-0.25f, 0.25f, -1.25f, 1.0f,
+        glUseProgram(0);
+    }
 
-			0.25f, 0.25f, -2.75f, 1.0f,
-			-0.25f, 0.25f, -1.25f, 1.0f,
-			-0.25f, 0.25f, -2.75f, 1.0f,
+    void renderHUD(mat4 base) {
+    }
 
-			0.25f, -0.25f, -2.75f, 1.0f,
-			-0.25f, -0.25f, -1.25f, 1.0f,
-			0.25f, -0.25f, -1.25f, 1.0f,
-
-			0.25f, -0.25f, -2.75f, 1.0f,
-			-0.25f, -0.25f, -2.75f, 1.0f,
-			-0.25f, -0.25f, -1.25f, 1.0f,
-
-			0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f,
-
-			0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f,
-			0.0f, 0.0f, 1.0f, 1.0f,
-
-			0.8f, 0.8f, 0.8f, 1.0f,
-			0.8f, 0.8f, 0.8f, 1.0f,
-			0.8f, 0.8f, 0.8f, 1.0f,
-
-			0.8f, 0.8f, 0.8f, 1.0f,
-			0.8f, 0.8f, 0.8f, 1.0f,
-			0.8f, 0.8f, 0.8f, 1.0f,
-
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 1.0f,
-
-			0.5f, 0.5f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.0f, 1.0f,
-
-			0.5f, 0.5f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.0f, 1.0f,
-
-			1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-
-			1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f,
-
-			0.0f, 1.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 1.0f, 1.0f,
-
-			0.0f, 1.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 1.0f, 1.0f,
-			0.0f, 1.0f, 1.0f, 1.0f,
-
-		};
-
-		ShaderProgram sp("data/shaders/simple.vert", "data/shaders/simple.frag");
-		program = sp.getProgram();
-		modelToCameraUniform = sp.getUniformLocation("modelToCameraMatrix");
-		cameraToClipUniform = sp.getUniformLocation("cameraToClipMatrix");
-
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof (vertexData), vertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-	}
-
-	void update(double delta) {
-	}
-
-	void renderWorld(mat4 base) {
-		if (print) {
-			cout << "World-to-camera matrix:" << endl;
-			printMatrix(glm::translate(base, vec3(-0.5, 0.5, 0)));
-			cout << "Camera-to-clip matrix:" << endl;
-			printMatrix(getCamera().getCameraToClipMatrix());
-		}
-		print = false;
-
-		glUseProgram(program);
-
-		glUniformMatrix4fv(modelToCameraUniform, 1, GL_FALSE, glm::value_ptr(glm::translate(base, vec3(-0.5, 0.5, 0))));
-		glUniformMatrix4fv(cameraToClipUniform, 1, GL_FALSE, glm::value_ptr(getCamera().getCameraToClipMatrix()));
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)(36 * 4 * sizeof(float)));
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glUseProgram(0);
-	}
-
-	void renderHUD(mat4 base) {
-	}
+    void resized(int width, int height) {
+        super::resized(width, height);
+        glUseProgram(program);
+        glUniformMatrix4fv(cameraToClipUniform, 1, GL_FALSE, glm::value_ptr(getCamera().getCameraToClipMatrix()));
+        glUseProgram(0);
+    }
 };
 
 int main() {
-	initHeliocentric();
+    initHeliocentric();
 
-	Camera camera(0.001f, 100, 1);
-	EngineTest game(800, 600, "test", true, camera);
-	game.run();
+    int width, height;
+    getCurrentResolution(&width, &height);
+    cout << "Screen resolution: " << width << "x" << height << endl;
 
-	exitHeliocentric();
-	return 0;
+    Camera camera(0.001f, 100, 1);
+    EngineTest game(800, 600, "test", true, false, camera);
+    game.run();
+
+    exitHeliocentric();
+    return 0;
 }

@@ -1,17 +1,33 @@
 Current tasks
 -----
-- [ ] Determine next step
+- [ ] Add entities
+  - [x] Add root node to HcGame3D, and make it update and render the tree
+  - [x] Add removeChild and orphanize methods
+  - [ ] Implement BasicEntity::render()
+  - [ ] Use matrix stack
+    - [ ] implement rotation
+  - [ ] Use composition of entities
+  - [ ] separate model and view
+- [ ] Complete TODO list
+
+###Considerations
+*If checked, the consideration is currently implemented, but might be chosen to be changed no to be.*
+- [ ] Make HcGame3D responsible for destroying entity tree?
+- [x] Make addChild responsible for setting the parent?
 
 Future tasks
 -----
-- [ ] Add objects
-- [ ] Make TODOlist complete
 - [ ] Add VSync support
 - [ ] Use VAO's
 - [ ] Handle multiple shader programs
+- [ ] Texture support
+- [ ] Use impostors for planets, instead of sphere meshes
+- [ ] Include a camera with a fixed up-direction
 - Improve lighting
   - [ ] Multiple light sources
   - [ ] Specular lighting
+  - [ ] HDR lighting
+  - [ ] gamma correction
   - [ ] Properly clamp lighting angle (BUG)
 - OpenGL 3.1 compatibility
   - [ ] Bind the shader attributes - required for OpenGL < 3.3

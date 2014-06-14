@@ -1,3 +1,7 @@
+/**
+ * A header for including the core libraries.
+ */
+
 #ifndef CORE_HPP
 #define	CORE_HPP
 

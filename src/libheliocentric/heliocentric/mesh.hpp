@@ -1,3 +1,6 @@
+#ifndef MESH_HPP
+#define	MESH_HPP
+
 #include "core.hpp"
 #include <string>
 #include <vector>
@@ -13,3 +16,4 @@ public:
     long unsigned int numberOfVertices();
 };
 
+#endif	/* MESH_HPP */

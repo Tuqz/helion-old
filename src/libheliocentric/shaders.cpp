@@ -116,15 +116,15 @@ ShaderProgram::ShaderProgram(string vertexShader, string geometryShader, string 
 	glDeleteShader(fs);
 }
 
-int ShaderProgram::getProgram() {
+GLuint ShaderProgram::getProgram() {
 	return program;
 }
 
-int ShaderProgram::getUniformLocation(string name) {
+GLint ShaderProgram::getUniformLocation(string name) {
 	return glGetUniformLocation(program, name.c_str());
 }
 
-int ShaderProgram::getUniformBlockIndex(string name) {
+GLuint ShaderProgram::getUniformBlockIndex(string name) {
 	return glGetUniformBlockIndex(program, name.c_str());
 }
 

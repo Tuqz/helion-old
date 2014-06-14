@@ -8,9 +8,9 @@ private:
 public:
 	ShaderProgram(string vertexShader, string fragmentShader);
 	ShaderProgram(string vertexShader, string geometryShader, string fragmentShader);
-	int getProgram();
-	int getUniformLocation(string name);
-	int getUniformBlockIndex(string name);
+	GLuint getProgram();
+	GLint getUniformLocation(string name);
+	GLuint getUniformBlockIndex(string name);
 	void destroy();
 };
 

@@ -1,6 +1,8 @@
 #include "heliocentric/hcgame3d.hpp"
 #include "heliocentric/shaders.hpp"
 #include "heliocentric/mesh.hpp"
+#include "heliocentric/entity.hpp"
+#include "heliocentric/matrixstack.hpp"
 #include <glm/gtc/matrix_transform.hpp> 
 #include <iostream>
 #include <unistd.h>
@@ -23,34 +25,62 @@ void printVector(vec3 vector) {
     cout << "pos = (" << vector.x << ", " << vector.y << ", " << vector.z << ")" << endl;
 }
 
+class TestEntity : public Entity {
+private:
+    Mesh& mesh;
+    ShaderProgram sp;
+
+public:
+
+    TestEntity(Mesh& mesh, ShaderProgram sp) : mesh(mesh), sp(sp) {
+    };
+
+    virtual void update(double delta) {
+    };
+
+    void render(MatrixStack& ms) {
+        glUseProgram(sp.getProgram());
+        ms.top() *= glm::translate(mat4(), position);
+        glUniformMatrix4fv(sp.getUniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(ms.top()));
+        mesh.render();
+        glUseProgram(0);
+    };
+};
+
 class EngineTest : public HcGame3D {
 private:
-    GLuint program, vao;
+    ShaderProgram sp;
+    GLuint vao;
     GLuint modelToCameraUniform, cameraToClipUniform, sunPositionUniform;
+    Entity* sun;
+    Entity* cube1;
+    Entity* cube2;
     Mesh mesh;
 
 public:
+
     EngineTest(int width, int height, string title, bool resizable,
             bool fullscreen, Camera& camera)
-            : HcGame3D(width, height, title, resizable, fullscreen, camera) {
+    : HcGame3D(width, height, title, resizable, fullscreen, camera), 
+    sp("data/shaders/simple.vert", "data/shaders/simple.frag") {
+    }
+
+    ~EngineTest() {
+        delete sun;
+        delete cube1;
+        delete cube2;
     }
 
     void init() {
         glfwPollEvents();
         super::init();
 
-        // Load the mesh
-        mesh.load("data/meshes/cube.obj");
-
-        // Create shader program
-        ShaderProgram sp("data/shaders/simple.vert", "data/shaders/simple.frag");
-        program = sp.getProgram();
         // Transform matrix uniforms
         modelToCameraUniform = sp.getUniformLocation("modelToCameraMatrix");
         cameraToClipUniform = sp.getUniformLocation("cameraToClipMatrix");
         // Lighting uniforms
         sunPositionUniform = sp.getUniformLocation("sunPosition");
-        glUseProgram(program);
+        glUseProgram(sp.getProgram());
         GLint u;
         u = sp.getUniformLocation("sunIntensity");
         glUniform4f(u, 0.9f, 0.9f, 0.9f, 1);
@@ -65,6 +95,20 @@ public:
         // Create vertex array
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
+
+        // Load the mesh
+        mesh.load("data/meshes/cube.obj");
+
+        // Create the entity tree
+        sun = new Entity();
+        cube1 = new TestEntity(mesh, sp);
+//        cube1->setPosition(vec3(-1, 0, -2));
+        cube1->setPosition(vec3(0, 0, -1));
+        cube2 = new TestEntity(mesh, sp);
+        cube2->setPosition(vec3(1.5f, 0, -0.5f));
+        cube1->addChild(cube2);
+        sun->addChild(cube1);
+        setRoot(sun);
 
         // Grab the mouse to control the camera
         grabMouse();
@@ -126,14 +170,11 @@ public:
     }
 
     void renderWorld(mat4 base) {
-        glUseProgram(program);
+        glUseProgram(sp.getProgram());
 
         vec4 sunCameraPosition = base * vec4(0, 0, 0, 1);
         glUniform3f(sunPositionUniform, sunCameraPosition.x, sunCameraPosition.y, sunCameraPosition.z);
-        glUniformMatrix4fv(modelToCameraUniform, 1, GL_FALSE, glm::value_ptr(glm::translate(base, vec3(-1, 0, -2))));
-
-        mesh.render();
-
+        
         glUseProgram(0);
     }
 
@@ -142,7 +183,7 @@ public:
 
     void resized(int width, int height) {
         super::resized(width, height);
-        glUseProgram(program);
+        glUseProgram(sp.getProgram());
         glUniformMatrix4fv(cameraToClipUniform, 1, GL_FALSE, glm::value_ptr(getCamera().getCameraToClipMatrix()));
         glUseProgram(0);
     }

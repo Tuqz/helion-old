@@ -8,7 +8,6 @@ private:
 	int fps;
 	GLFWwindow* window;
 	double prev_x, prev_y;
-//public:
 	double scroll_dx, scroll_dy;
 public:
 	HcGame(int width, int height, std::string title, bool resizable, bool fullscreen);

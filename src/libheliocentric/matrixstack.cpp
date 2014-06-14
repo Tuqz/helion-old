@@ -1,3 +1,5 @@
+#include <glm/gtc/type_ptr.hpp>
+
 #include "heliocentric/matrixstack.hpp"
 
 using namespace glm;
@@ -24,23 +26,11 @@ void MatrixStack::pop() {
     }
 }
 
-//void MatrixStack::translate(const vec3& vector) {
-//}
-//
-//void MatrixStack::translate(float x, float y, float z) {
-//}
-//
-//void MatrixStack::scale(const vec3& vector) {
-//}
-//
-//void MatrixStack::scale(float x, float y, float z) {
-//}
-//
-//void MatrixStack::scale(float factor) {
-//}
-//
-//void MatrixStack::apply(const mat4& matrix) {
-//}
-//
-//MatrixStack& MatrixStack::operator*=(const mat4& matrix) {
-//}
+float* MatrixStack::array() {
+    return value_ptr(ms.top());
+}
+
+MatrixStack& MatrixStack::operator*=(const mat4& matrix) {
+    ms.top() *= matrix;
+    return *this;
+}

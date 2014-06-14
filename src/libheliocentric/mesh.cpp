@@ -68,7 +68,7 @@ bool Mesh::load(const string& filename) {
     vertexData.insert(vertexData.end(), normals.begin(), normals.end());
 
     // Close the file
-    file.close()
+    file.close();
 
     // Upload data to VRAM
     glGenBuffers(1, &vbo);

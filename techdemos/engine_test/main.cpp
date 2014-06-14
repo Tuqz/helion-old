@@ -40,8 +40,8 @@ public:
 
     void render(MatrixStack& ms) {
         glUseProgram(sp.getProgram());
-        ms.top() *= glm::translate(mat4(), position);
-        glUniformMatrix4fv(sp.getUniformLocation("modelToCameraMatrix"), 1, GL_FALSE, glm::value_ptr(ms.top()));
+        ms *= glm::translate(mat4(), position);
+        glUniformMatrix4fv(sp.getUniformLocation("modelToCameraMatrix"), 1, GL_FALSE, ms.array());
         mesh.render();
         glUseProgram(0);
     };

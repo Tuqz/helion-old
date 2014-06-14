@@ -68,74 +68,7 @@ bool Mesh::load(const string& filename) {
     vertexData.insert(vertexData.end(), normals.begin(), normals.end());
 
     // Close the file
-    file.close();
-
-//    float vertexData2[] = {
-//        0.5f, 0.5f, 0.5f,
-//        0.5f, -0.5f, 0.5f,
-//        -0.5f, -0.5f, 0.5f,
-//        -0.5f, 0.5f, 0.5f,
-//        0.5f, 0.5f, 0.5f,
-//        -0.5f, 0.5f, 0.5f,
-//        -0.5f, 0.5f, -0.5f,
-//        0.5f, 0.5f, -0.5f,
-//        0.5f, 0.5f, 0.5f,
-//        0.5f, 0.5f, -0.5f,
-//        0.5f, -0.5f, -0.5f,
-//        0.5f, -0.5f, 0.5f,
-//        0.5f, 0.5f, -0.5f,
-//        -0.5f, 0.5f, -0.5f,
-//        -0.5f, -0.5f, -0.5f,
-//        0.5f, -0.5f, -0.5f,
-//        0.5f, -0.5f, 0.5f,
-//        0.5f, -0.5f, -0.5f,
-//        -0.5f, -0.5f, -0.5f,
-//        -0.5f, -0.5f, 0.5f,
-//        -0.5f, 0.5f, 0.5f,
-//        -0.5f, -0.5f, 0.5f,
-//        -0.5f, -0.5f, -0.5f,
-//        -0.5f, 0.5f, -0.5f,
-//        0, 0, 1,
-//        0, 0, 1,
-//        0, 0, 1,
-//        0, 0, 1,
-//        0, 1, 0,
-//        0, 1, 0,
-//        0, 1, 0,
-//        0, 1, 0,
-//        1, 0, 0,
-//        1, 0, 0,
-//        1, 0, 0,
-//        1, 0, 0,
-//        0, 0, -1,
-//        0, 0, -1,
-//        0, 0, -1,
-//        0, 0, -1,
-//        0, -1, 0,
-//        0, -1, 0,
-//        0, -1, 0,
-//        0, -1, 0,
-//        -1, 0, 0,
-//        -1, 0, 0,
-//        -1, 0, 0,
-//        -1, 0, 0
-//    };
-//
-//    unsigned short indices2[] = {
-//        0, 1, 2,
-//        2, 3, 0,
-//        4, 5, 6,
-//        6, 7, 4,
-//        8, 9, 10,
-//        10, 11, 8,
-//        12, 13, 14,
-//        14, 15, 12,
-//        16, 17, 18,
-//        18, 19, 16,
-//        20, 21, 22,
-//        22, 23, 20
-//    };
-
+    file.close()
 
     // Upload data to VRAM
     glGenBuffers(1, &vbo);
@@ -143,12 +76,10 @@ bool Mesh::load(const string& filename) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER,
             sizeof (float) * vertexData.size(), &vertexData[0], GL_STATIC_DRAW);
-//                sizeof (vertexData2), &vertexData2[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
             sizeof (unsigned short) * indices.size(), &indices[0], GL_STATIC_DRAW);
-//                sizeof (indices2), &indices2[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Success
@@ -161,7 +92,7 @@ void Mesh::render() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);//(void*) (numberOfVertices() * sizeof (float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (numberOfVertices() * sizeof (float)));
 
     glDrawElements(GL_TRIANGLES, numberOfVertices(), GL_UNSIGNED_SHORT, 0);
 

@@ -102,8 +102,7 @@ public:
         // Create the entity tree
         sun = new Entity();
         cube1 = new TestEntity(mesh, sp);
-//        cube1->setPosition(vec3(-1, 0, -2));
-        cube1->setPosition(vec3(0, 0, -1));
+        cube1->setPosition(vec3(-1, 0, -2));
         cube2 = new TestEntity(mesh, sp);
         cube2->setPosition(vec3(1.5f, 0, -0.5f));
         cube1->addChild(cube2);

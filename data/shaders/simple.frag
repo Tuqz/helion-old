@@ -18,19 +18,16 @@ vec4 applyLightIntensity(in vec3 cameraSpacePosition, out vec3 dirToLightSource)
     float lightDistanceSqr = dot(lightDifference, lightDifference);
     dirToLightSource = lightDifference * inversesqrt(lightDistanceSqr);
     
-	return sunIntensity / ( 1.0 + attenuationFactor * lightDistanceSqr);
+    return sunIntensity / ( 1.0 + attenuationFactor * lightDistanceSqr);
 }
 
 void main()
 {
-	vec3 dirToSun = vec3(0.0);
-	vec4 attenIntensity = applyLightIntensity(cameraSpacePosition, dirToSun);
-	float cosAI_sun = clamp(dot(vertexNormal, dirToSun), 0, 1);
-	//cosAI is not clamped properly, as it seems
+    vec3 dirToSun = vec3(0.0);
+    vec4 attenIntensity = applyLightIntensity(cameraSpacePosition, dirToSun);
+    float cosAI_sun = clamp(dot(vertexNormal, dirToSun), 0, 1);
 
-	// Output including ambient and diffuse lighting
-	outputColor = diffuseColor * ambientIntensity
-			+ diffuseColor * attenIntensity * cosAI_sun;
-
-//	outputColor = vec4(0.5,0.5,0.5,1);
+    // Output including ambient and diffuse lighting
+    outputColor = diffuseColor * ambientIntensity
+            + diffuseColor * attenIntensity * cosAI_sun;
 }

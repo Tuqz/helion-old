@@ -3,9 +3,8 @@ Current tasks
 - [ ] Add entities
   - [x] Add root node to HcGame3D, and make it update and render the tree
   - [x] Add removeChild and orphanize methods
-  - [ ] Implement BasicEntity::render()
-  - [ ] Use matrix stack
-    - [ ] implement rotation
+  - [x] Implement BasicEntity::render()
+  - [x] Use matrix stack
   - [ ] Use composition of entities
   - [ ] separate model and view
 - [ ] Complete TODO list
@@ -28,7 +27,7 @@ Future tasks
   - [ ] Specular lighting
   - [ ] HDR lighting
   - [ ] gamma correction
-  - [ ] Properly clamp lighting angle (BUG)
+  - [x] ~~Properly clamp lighting angle (BUG)~~
 - OpenGL 3.1 compatibility
   - [ ] Bind the shader attributes - required for OpenGL < 3.3
   - [ ] Might need to disable OpenGL > 3.1 calls with #IF statements

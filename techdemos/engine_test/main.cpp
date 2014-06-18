@@ -97,15 +97,16 @@ public:
         glBindVertexArray(vao);
 
         // Load the mesh
-        mesh.load("data/meshes/cube.obj");
+//        mesh.load("data/meshes/cube3.obj");
+        mesh.load("data/meshes/toroidal.obj");
 
         // Create the entity tree
         sun = new Entity();
         cube1 = new TestEntity(mesh, sp);
-        cube1->setPosition(vec3(-1, 0, -2));
-        cube2 = new TestEntity(mesh, sp);
-        cube2->setPosition(vec3(1.5f, 0, -0.5f));
-        cube1->addChild(cube2);
+        cube1->setPosition(vec3(-1, -0.75f, -2));
+//        cube2 = new TestEntity(mesh, sp);
+//        cube2->setPosition(vec3(1.5f, 0, -0.5f));
+//        cube1->addChild(cube2);
         sun->addChild(cube1);
         setRoot(sun);
 
@@ -189,8 +190,12 @@ public:
 };
 
 int main() {
-    initHeliocentric();
-
+    int ok = initHeliocentric();
+    if (!ok) {
+        cerr << "Failed to initialize heliocentric" << endl;
+        exit(EXIT_FAILURE);
+    }
+    
     int width, height;
     getCurrentResolution(&width, &height);
     cout << "Screen resolution: " << width << "x" << height << endl;

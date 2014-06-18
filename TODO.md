@@ -8,6 +8,8 @@ Current tasks
   - [ ] Use composition of entities
   - [ ] separate model and view
 - [ ] More general mesh loading
+  - [x] Separate indices for vertices, textures and normals
+  - [ ] Support different lengths for the vertex specification
 
 ###Considerations
 *If checked, the consideration is currently implemented, but might be chosen to be changed not to be.*
@@ -19,7 +21,9 @@ Future tasks
 - [ ] Add VSync support
 - [ ] Use VAO's
 - [ ] Handle multiple shader programs
-- [ ] Texture support
+- Texture support
+  - [ ] In mesh loader
+  - [ ] In renderer
 - [ ] Use impostors for planets, instead of sphere meshes
 - [ ] Include a camera with a fixed up-direction
 - [ ] Have a sun model

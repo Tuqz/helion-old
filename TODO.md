@@ -33,7 +33,7 @@ Future tasks
   - [ ] Specular lighting
   - [ ] HDR lighting
   - [ ] gamma correction
-  - [x] ~~Properly clamp lighting angle (BUG)~~
+  - [ ] shadows
 - OpenGL 3.1 compatibility
   - [ ] Bind the shader attributes - required for OpenGL < 3.3
   - [ ] Might need to disable OpenGL > 3.1 calls with #IF statements

@@ -97,16 +97,16 @@ public:
         glBindVertexArray(vao);
 
         // Load the mesh
-//        mesh.load("data/meshes/cube3.obj");
-        mesh.load("data/meshes/toroidal.obj");
+        mesh.load("data/meshes/cube2.obj");
+//        mesh.load("data/meshes/toroidal.obj");
 
         // Create the entity tree
         sun = new Entity();
         cube1 = new TestEntity(mesh, sp);
         cube1->setPosition(vec3(-1, -0.75f, -2));
-//        cube2 = new TestEntity(mesh, sp);
-//        cube2->setPosition(vec3(1.5f, 0, -0.5f));
-//        cube1->addChild(cube2);
+        cube2 = new TestEntity(mesh, sp);
+        cube2->setPosition(vec3(1.5f, 0, -0.5f));
+        cube1->addChild(cube2);
         sun->addChild(cube1);
         setRoot(sun);
 

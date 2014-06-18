@@ -1,10 +1,16 @@
 #include "heliocentric/mesh.hpp"
 #include <fstream>
 #include <iostream>
-#include <map>
-//#include <GL/glext.h>
+#include <list>
 
 using namespace std;
+
+typedef struct _IndexPair IndexPair;
+
+struct _IndexPair {
+    int normalIndex;
+    int actualIndex;
+};
 
 vector<string> tokenize(string line, char token = ' ', bool allowEmptyTokens = false) {
     vector<string> tokens;
@@ -29,6 +35,15 @@ vector<string> tokenize(string line, char token = ' ', bool allowEmptyTokens = f
     return tokens;
 }
 
+int getIndex(list<IndexPair>* l, unsigned short normalIndex) {
+    for (list<IndexPair>::const_iterator it = l->begin(); it != l->end(); it++) {
+        if (it->normalIndex == normalIndex) {
+            return it->actualIndex;
+        }
+    }
+    return -1;
+}
+
 bool Mesh::load(const string& filename) {
     // Open the file
     std::ifstream file(filename.c_str());
@@ -39,8 +54,6 @@ bool Mesh::load(const string& filename) {
 
     // Containers
     string line;
-    nVertices = 0;
-    nFaces = 0;
     vector<string> tokens;
     vector<string> tokens2;
     vector<float> vertices;
@@ -48,6 +61,7 @@ bool Mesh::load(const string& filename) {
     vector<unsigned short> vIndices;
     //vector<unsigned short> tIndices;
     vector<unsigned short> nIndices;
+    int nVertices = 0;
 
     // Parse the file
     while (!file.eof()) {
@@ -64,7 +78,6 @@ bool Mesh::load(const string& filename) {
             } else if (tokens.front().compare("vn") == 0) {
                 for (int i = 1; i < tokens.size(); i++) {
                     normals.push_back(atof(tokens[i].c_str()));
-                    nNormals++;
                 }
             } else if (tokens.front().compare("f") == 0) {
                 for (int i = 1; i < tokens.size(); i++) {
@@ -72,7 +85,6 @@ bool Mesh::load(const string& filename) {
                     vIndices.push_back(atoi(tokens2[0].c_str()));
                     //tIndices.push_back(atoi(tokens2[1].c_str()));
                     nIndices.push_back(atoi(tokens2[2].c_str()));
-                    nFaces++;
                 }
             }//else { skip }
         }
@@ -82,25 +94,32 @@ bool Mesh::load(const string& filename) {
     file.close();
 
     // Create the vertex data array
-    int addr;
+    list<IndexPair>* lookup;
+    lookup = new list<IndexPair>[nVertices]();
+
+    unsigned short nextIndex = 0;
+    int index, vIndex, nIndex;
+    list<IndexPair>* l;
     for (int i = 0; i < vIndices.size(); i++) {
-        addr = (vIndices[i] - 1)*3;
-        vertexData.push_back(vertices[addr]);
-        vertexData.push_back(vertices[addr + 1]);
-        vertexData.push_back(vertices[addr + 2]);
-        addr = (nIndices[i] - 1)*3;
-        vertexData.push_back(normals[addr]);
-        vertexData.push_back(normals[addr + 1]);
-        vertexData.push_back(normals[addr + 2]);
-        indices.push_back(i);
+        vIndex = vIndices[i] - 1;
+        nIndex = nIndices[i] - 1;
+        l = &lookup[vIndex];
+        index = getIndex(l, nIndex);
+        if (index == -1) {
+            vertexData.push_back(vertices[vIndex * 3]);
+            vertexData.push_back(vertices[vIndex * 3 + 1]);
+            vertexData.push_back(vertices[vIndex * 3 + 2]);
+            vertexData.push_back(normals[nIndex * 3]);
+            vertexData.push_back(normals[nIndex * 3 + 1]);
+            vertexData.push_back(normals[nIndex * 3 + 2]);
+            index = nextIndex;
+            l->push_back({nIndex, index});
+            nextIndex++;
+        }
+        indices.push_back(index);
     }
 
-    // Append normals to the array
-//    vertexData.insert(vertexData.end(), normalData.begin(), normalData.end());
-//    for (int i = 0; i < vertexData.size(); i+=6) {
-//        cout << vertexData[i] << " " << vertexData[i+1] << " " << vertexData[i+2] << " - "
-//                << vertexData[i+3] << " " << vertexData[i+4] << " " << vertexData[i+5] << endl;
-//    }
+    delete [] lookup;
 
     // Upload data to VRAM
     glGenBuffers(1, &vbo);
@@ -115,6 +134,7 @@ bool Mesh::load(const string& filename) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Success
+
     return true;
 }
 
@@ -123,21 +143,13 @@ void Mesh::render() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (6 * sizeof(float)), 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (6 * sizeof(float)), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (6 * sizeof (float)), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (6 * sizeof (float)), (void*) (3 * sizeof (float)));
 
-    glDrawElements(GL_TRIANGLES, numberOfFaces(), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-long unsigned int Mesh::numberOfVertices() {
-    return nVertices;
-}
-
-long unsigned int Mesh::numberOfFaces() {
-    return nFaces;
 }

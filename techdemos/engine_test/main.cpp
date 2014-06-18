@@ -3,6 +3,7 @@
 #include "heliocentric/mesh.hpp"
 #include "heliocentric/entity.hpp"
 #include "heliocentric/matrixstack.hpp"
+#include "heliocentric/objloader.hpp"
 #include <glm/gtc/matrix_transform.hpp> 
 #include <iostream>
 #include <unistd.h>
@@ -97,8 +98,9 @@ public:
         glBindVertexArray(vao);
 
         // Load the mesh
-        mesh.load("data/meshes/cube2.obj");
+//        mesh.load("data/meshes/cube2.obj");
 //        mesh.load("data/meshes/toroidal.obj");
+        loadOBJ(mesh, "data/meshes/toroidal.obj");
 
         // Create the entity tree
         sun = new Entity();

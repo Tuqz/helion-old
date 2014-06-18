@@ -49,14 +49,14 @@ bool loadOBJ(Mesh& mesh, const string& filename) {
     // Open the file
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        cerr << "Unable to open file " << filename << endl;
+        cerr << "Unable to open file \"" << filename << "\"" << endl;
         return false;
     }
 
     // Containers
     vector<float> vertexData;
     vector<unsigned short> indices;
-    
+
     // Temporary variables
     string line;
     vector<string> tokens;
@@ -67,29 +67,64 @@ bool loadOBJ(Mesh& mesh, const string& filename) {
     //vector<unsigned short> tIndices;
     vector<unsigned short> nIndices;
     int nVertices = 0;
+    int lineNumber = 0;
 
     // Parse the file
     while (!file.eof()) {
+        lineNumber++;
         std::getline(file, line);
 
         if (line.length() > 0) {
             tokens = tokenize(line);
 
             if (tokens.front().compare("v") == 0) {
+                if (tokens.size() != 4) {
+                    cerr << "Error while parsing \"" << filename << "\"" << endl;
+                    cerr << "    Expected three coordinates in line "
+                            << lineNumber << ": \"" << line << "\"" << endl;
+                    return false;
+                }
                 for (int i = 1; i < tokens.size(); i++) {
                     vertices.push_back(atof(tokens[i].c_str()));
                     nVertices++;
                 }
             } else if (tokens.front().compare("vn") == 0) {
+                if (tokens.size() != 4) {
+                    cerr << "Error while parsing \"" << filename << "\"" << endl;
+                    cerr << "    Expected three components in line "
+                            << lineNumber << ": \"" << line << "\"" << endl;
+                    return false;
+                }
                 for (int i = 1; i < tokens.size(); i++) {
                     normals.push_back(atof(tokens[i].c_str()));
                 }
             } else if (tokens.front().compare("f") == 0) {
+                if (tokens.size() != 4) {
+                    cerr << "Error while parsing \"" << filename << "\"" << endl;
+                    cerr << "    Expected three indices in line "
+                            << lineNumber << ": \"" << line << "\"" << endl;
+                    return false;
+                }
                 for (int i = 1; i < tokens.size(); i++) {
                     tokens2 = tokenize(tokens[i], '/', true);
-                    vIndices.push_back(atoi(tokens2[0].c_str()));
-                    //tIndices.push_back(atoi(tokens2[1].c_str()));
-                    nIndices.push_back(atoi(tokens2[2].c_str()));
+                    if (tokens2.size() == 3) {
+                        vIndices.push_back(atoi(tokens2[0].c_str()));
+                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        nIndices.push_back(atoi(tokens2[2].c_str()));
+                    } else if (tokens2.size() == 2) {
+                        vIndices.push_back(atoi(tokens2[0].c_str()));
+                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        nIndices.push_back(atoi(tokens2[0].c_str()));
+                    } else if (tokens2.size() == 1) {
+                        vIndices.push_back(atoi(tokens2[0].c_str()));
+                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        nIndices.push_back(atoi(tokens2[0].c_str()));
+                    } else {
+                        cerr << "Error while parsing \"" << filename << "\"" << endl;
+                        cerr << "    Incorrect face specification in line "
+                                << lineNumber << ": \"" << line << "\"" << endl;
+                        return false;
+                    }
                 }
             }//else { skip }
         }
@@ -126,6 +161,12 @@ bool loadOBJ(Mesh& mesh, const string& filename) {
     }
 
     delete [] lookup;
+
+    if (indices.size() < 3) {
+        cerr << "Error while parsing \"" << filename << "\"" << endl;
+        cerr << "    No faces in mesh" << endl;
+        return false;
+    }
 
     // Load the data into the mesh
     mesh.load(vertexData, indices);

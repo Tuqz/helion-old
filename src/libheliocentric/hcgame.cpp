@@ -140,7 +140,7 @@ void HcGame::run() {
 		scroll_dx = 0;
 		scroll_dy = 0;
 
-		// Draw the new frame
+		// Draw the next frame
 		render();
 
 		// Switch draw buffers

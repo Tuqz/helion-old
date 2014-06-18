@@ -7,16 +7,16 @@ Current tasks
   - [x] Use matrix stack
   - [ ] Use composition of entities
   - [ ] separate model and view
-- [ ] Improve mesh loading
+- [x] Improve mesh loading
   - [x] Separate indices for vertices, textures and normals
-  - [ ] Support different lengths for the vertex specification
   - [x] Separate loading code from actual mesh code
-  - [ ] Fail nicely at syntax errors
+  - [x] Fail nicely at syntax errors
 
 ###Considerations
 *If checked, the consideration is currently implemented, but might be chosen to be changed not to be.*
 - [ ] Make HcGame3D responsible for destroying entity tree?
 - [x] Make addChild responsible for setting the parent?
+- [x] Switch to CCW winding front faces?
 
 Future tasks
 -----
@@ -41,3 +41,7 @@ Future tasks
   - [ ] Might need to disable OpenGL > 3.1 calls with #IF statements
 - Windows compatibility
   - [ ] Add windows alternative for usleep call
+  
+Optional tasks
+-----
+- [ ] OBJ loader: Support different lengths for the vertex specification

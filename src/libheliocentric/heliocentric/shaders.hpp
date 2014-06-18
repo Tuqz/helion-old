@@ -1,3 +1,7 @@
+#ifndef SHADERS_HPP
+#define	SHADERS_HPP
+
+#include "core.hpp"
 #include <string>
 
 using namespace std;
@@ -14,3 +18,4 @@ public:
 	void destroy();
 };
 
+#endif

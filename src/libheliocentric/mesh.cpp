@@ -1,4 +1,5 @@
 #include "heliocentric/mesh.hpp"
+#include "heliocentric/shaders.hpp"
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -39,4 +40,16 @@ void Mesh::render() {
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+MeshAppearance::MeshAppearance(Mesh* mesh, ShaderProgram* sp) : mesh(mesh), sp(sp) {
+    
+}
+
+void MeshAppearance::render(MatrixStack& ms) {
+    mesh->render();
+}
+
+ShaderProgram* MeshAppearance::getProgram() {
+    return sp;
 }

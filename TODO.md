@@ -5,8 +5,9 @@ Current tasks
   - [x] Add removeChild and orphanize methods
   - [x] Implement BasicEntity::render()
   - [x] Use matrix stack
+  - [ ] Entity orientation
   - [ ] Use composition of entities
-  - [ ] separate model and view
+  - [x] separate model and view
 - [x] Improve mesh loading
   - [x] Separate indices for vertices, textures and normals
   - [x] Separate loading code from actual mesh code
@@ -17,6 +18,7 @@ Current tasks
 - [ ] Make HcGame3D responsible for destroying entity tree?
 - [x] Make addChild responsible for setting the parent?
 - [x] Switch to CCW winding front faces?
+- [x] Is the used approach with MeshAppearance the right one? How must programs be handled?
 
 Future tasks
 -----
@@ -26,10 +28,12 @@ Future tasks
 - Texture support
   - [ ] In mesh loader
   - [ ] In renderer
+- [ ] Mesh scaling
 - [ ] Use impostors for planets, instead of sphere meshes
 - [ ] Include a camera with a fixed up-direction
 - [ ] Have a sun model
 - [ ] Render background
+- [ ] Bump mapping
 - Improve lighting
   - [ ] Multiple light sources
   - [ ] Specular lighting

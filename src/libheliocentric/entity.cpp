@@ -1,10 +1,14 @@
 #include "heliocentric/entity.hpp"
+#include <glm/gtc/matrix_transform.hpp> 
 
 #include <cstddef> //For NULL
 
 using namespace std;
 
-Entity::Entity() : parent(NULL) {
+Entity::Entity() : Entity(NULL) {
+}
+
+Entity::Entity(Appearance* appearance) : parent(NULL), appearance(appearance) {
 }
 
 void Entity::updateAll(double delta) {
@@ -22,6 +26,18 @@ void Entity::renderAll(MatrixStack& ms) {
     }
     ms.pop();
 }
+
+void Entity::render(MatrixStack& ms) {
+    ms *= glm::translate(glm::mat4(), position);
+    if (appearance != NULL) {
+        glUseProgram(appearance->getProgram()->getProgram());
+        glUniformMatrix4fv(
+                appearance->getProgram()->getUniformLocation("modelToCameraMatrix"), 
+                1, GL_FALSE, ms.array());
+        appearance->render(ms);
+        glUseProgram(0);
+    }
+};
 
 void Entity::setPosition(glm::vec3 position) {
     this->position = position;

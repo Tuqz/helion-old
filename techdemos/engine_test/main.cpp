@@ -26,50 +26,31 @@ void printVector(vec3 vector) {
     cout << "pos = (" << vector.x << ", " << vector.y << ", " << vector.z << ")" << endl;
 }
 
-class TestEntity : public Entity {
-private:
-    Mesh& mesh;
-    ShaderProgram sp;
-
-public:
-
-    TestEntity(Mesh& mesh, ShaderProgram sp) : mesh(mesh), sp(sp) {
-    };
-
-    virtual void update(double delta) {
-    };
-
-    void render(MatrixStack& ms) {
-        glUseProgram(sp.getProgram());
-        ms *= glm::translate(mat4(), position);
-        glUniformMatrix4fv(sp.getUniformLocation("modelToCameraMatrix"), 1, GL_FALSE, ms.array());
-        mesh.render();
-        glUseProgram(0);
-    };
-};
-
 class EngineTest : public HcGame3D {
 private:
     ShaderProgram sp;
     GLuint vao;
     GLuint modelToCameraUniform, cameraToClipUniform, sunPositionUniform;
     Entity* sun;
-    Entity* cube1;
-    Entity* cube2;
-    Mesh mesh;
-
+    Entity* object1;
+    Entity* object2;
+    Mesh mesh1, mesh2;
+    MeshAppearance* mapp1;
+    MeshAppearance* mapp2;
 public:
 
     EngineTest(int width, int height, string title, bool resizable,
             bool fullscreen, Camera& camera)
-    : HcGame3D(width, height, title, resizable, fullscreen, camera), 
+    : HcGame3D(width, height, title, resizable, fullscreen, camera),
     sp("data/shaders/simple.vert", "data/shaders/simple.frag") {
     }
 
     ~EngineTest() {
         delete sun;
-        delete cube1;
-        delete cube2;
+        delete object1;
+        delete object2;
+        delete mapp1;
+        delete mapp2;
     }
 
     void init() {
@@ -98,18 +79,19 @@ public:
         glBindVertexArray(vao);
 
         // Load the mesh
-//        mesh.load("data/meshes/cube2.obj");
-//        mesh.load("data/meshes/toroidal.obj");
-        loadOBJ(mesh, "data/meshes/toroidal.obj");
+        loadOBJ(mesh1, "data/meshes/toroidal.obj");
+        loadOBJ(mesh2, "data/meshes/sphere.obj");
+        mapp1 = new MeshAppearance(&mesh1, &sp);
+        mapp2 = new MeshAppearance(&mesh2, &sp);
 
         // Create the entity tree
         sun = new Entity();
-        cube1 = new TestEntity(mesh, sp);
-        cube1->setPosition(vec3(-1, -0.75f, -2));
-        cube2 = new TestEntity(mesh, sp);
-        cube2->setPosition(vec3(1.5f, 0, -0.5f));
-        cube1->addChild(cube2);
-        sun->addChild(cube1);
+        object1 = new Entity(mapp1);
+        object1->setPosition(vec3(-1, -0.75f, -2));
+        object2 = new Entity(mapp2);
+        object2->setPosition(vec3(1.5f, 0, -0.5f));
+        object1->addChild(object2);
+        sun->addChild(object1);
         setRoot(sun);
 
         // Grab the mouse to control the camera
@@ -176,7 +158,7 @@ public:
 
         vec4 sunCameraPosition = base * vec4(0, 0, 0, 1);
         glUniform3f(sunPositionUniform, sunCameraPosition.x, sunCameraPosition.y, sunCameraPosition.z);
-        
+
         glUseProgram(0);
     }
 
@@ -197,7 +179,7 @@ int main() {
         cerr << "Failed to initialize heliocentric" << endl;
         exit(EXIT_FAILURE);
     }
-    
+
     int width, height;
     getCurrentResolution(&width, &height);
     cout << "Screen resolution: " << width << "x" << height << endl;

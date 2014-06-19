@@ -8,20 +8,16 @@ Current tasks
   - [ ] Entity orientation
   - [ ] Use composition of entities
   - [x] separate model and view
-- [x] Improve mesh loading
-  - [x] Separate indices for vertices, textures and normals
-  - [x] Separate loading code from actual mesh code
-  - [x] Fail nicely at syntax errors
 
 ###Considerations
 *If checked, the consideration is currently implemented, but might be chosen to be changed not to be.*
 - [ ] Make HcGame3D responsible for destroying entity tree?
 - [x] Make addChild responsible for setting the parent?
 - [x] Switch to CCW winding front faces?
-- [x] Is the used approach with MeshAppearance the right one? How must programs be handled?
 
 Future tasks
 -----
+- [ ] Make mouse controls more intuitive
 - [ ] Add VSync support
 - [ ] Use VAO's
 - [ ] Handle multiple shader programs

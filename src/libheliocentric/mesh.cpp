@@ -6,9 +6,11 @@
 
 using namespace std;
 
-void Mesh::load(std::vector<float> vertexData, std::vector<unsigned short> indices) {
+void Mesh::load(std::vector<float> vertexData, std::vector<unsigned short> indices, 
+        ShaderProgram* sp) {
     this->vertexData = vertexData;
     this->indices = indices;
+    this->sp = sp;
     load();
 }
 
@@ -26,7 +28,7 @@ void Mesh::load() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::render() {
+void Mesh::render(MatrixStack& ms) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glEnableVertexAttribArray(0);
@@ -42,14 +44,6 @@ void Mesh::render() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-MeshAppearance::MeshAppearance(Mesh* mesh, ShaderProgram* sp) : mesh(mesh), sp(sp) {
-    
-}
-
-void MeshAppearance::render(MatrixStack& ms) {
-    mesh->render();
-}
-
-ShaderProgram* MeshAppearance::getProgram() {
+ShaderProgram* Mesh::getShaderProgram() {
     return sp;
 }

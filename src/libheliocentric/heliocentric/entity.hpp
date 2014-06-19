@@ -8,9 +8,9 @@
 
 class Appearance {
 public:
-//    virtual ~Appearance() {};
+    virtual ~Appearance() {};
     virtual void render(MatrixStack& ms) = 0;
-    virtual ShaderProgram* getProgram() = 0;
+    virtual ShaderProgram* getShaderProgram() = 0;
 };
 
 class Entity {

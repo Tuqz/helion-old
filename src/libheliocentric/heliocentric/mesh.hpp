@@ -5,25 +5,19 @@
 #include "entity.hpp"
 #include <vector>
 
-class Mesh {
+class Mesh : public Appearance {
 private:
     std::vector<float> vertexData;
     std::vector<unsigned short> indices;
     GLuint vbo, ebo;
-public:
-    void load(std::vector<float> vertexData, std::vector<unsigned short> indices);
-    void load();
-    void render();
-};
-
-class MeshAppearance : public Appearance {
-private:
-    Mesh* mesh;
     ShaderProgram* sp;
 public:
-    MeshAppearance(Mesh* mesh, ShaderProgram* sp);
+    void load(std::vector<float> vertexData, std::vector<unsigned short> indices, 
+            ShaderProgram* sp);
+    void load();
+    void render();
     virtual void render(MatrixStack& ms);
-    virtual ShaderProgram* getProgram();
+    virtual ShaderProgram* getShaderProgram();
 };
 
 #endif	/* MESH_HPP */

@@ -13,6 +13,9 @@ struct _IndexPair {
     int actualIndex;
 };
 
+ObjLoader::ObjLoader(ShaderProgram& sp) : sp(sp) {
+}
+
 vector<string> tokenize(string line, char token = ' ', bool allowEmptyTokens = false) {
     vector<string> tokens;
     int tokenStart = 0;
@@ -45,7 +48,7 @@ int getIndex(list<IndexPair>* l, unsigned short normalIndex) {
     return -1;
 }
 
-bool loadOBJ(Mesh& mesh, const string& filename) {
+bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
     // Open the file
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
@@ -169,5 +172,5 @@ bool loadOBJ(Mesh& mesh, const string& filename) {
     }
 
     // Load the data into the mesh
-    mesh.load(vertexData, indices);
+    mesh.load(vertexData, indices, &sp);
 }

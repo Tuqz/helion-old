@@ -35,8 +35,6 @@ private:
     Entity* object1;
     Entity* object2;
     Mesh mesh1, mesh2;
-    MeshAppearance* mapp1;
-    MeshAppearance* mapp2;
 public:
 
     EngineTest(int width, int height, string title, bool resizable,
@@ -49,8 +47,6 @@ public:
         delete sun;
         delete object1;
         delete object2;
-        delete mapp1;
-        delete mapp2;
     }
 
     void init() {
@@ -79,16 +75,15 @@ public:
         glBindVertexArray(vao);
 
         // Load the mesh
-        loadOBJ(mesh1, "data/meshes/toroidal.obj");
-        loadOBJ(mesh2, "data/meshes/sphere.obj");
-        mapp1 = new MeshAppearance(&mesh1, &sp);
-        mapp2 = new MeshAppearance(&mesh2, &sp);
+        ObjLoader loader(sp);
+        loader.loadOBJ(mesh1, "data/meshes/toroidal.obj");
+        loader.loadOBJ(mesh2, "data/meshes/sphere.obj");
 
         // Create the entity tree
         sun = new Entity();
-        object1 = new Entity(mapp1);
+        object1 = new Entity(&mesh1);
         object1->setPosition(vec3(-1, -0.75f, -2));
-        object2 = new Entity(mapp2);
+        object2 = new Entity(&mesh2);
         object2->setPosition(vec3(1.5f, 0, -0.5f));
         object1->addChild(object2);
         sun->addChild(object1);

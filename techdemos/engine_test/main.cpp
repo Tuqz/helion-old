@@ -7,7 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp> 
 #include <iostream>
 #include <unistd.h>
-
+#include <math.h>
+        
 #define super HcGame3D
 
 using namespace std;
@@ -34,7 +35,8 @@ private:
     Entity* sun;
     Entity* object1;
     Entity* object2;
-    Mesh mesh1, mesh2;
+    Entity* object3;
+    Mesh mesh1, mesh2, mesh3;
 public:
 
     EngineTest(int width, int height, string title, bool resizable,
@@ -47,6 +49,7 @@ public:
         delete sun;
         delete object1;
         delete object2;
+        delete object3;
     }
 
     void init() {
@@ -76,16 +79,21 @@ public:
 
         // Load the mesh
         ObjLoader loader(sp);
-        loader.loadOBJ(mesh1, "data/meshes/toroidal.obj");
+        loader.loadOBJ(mesh1, "data/meshes/cube2.obj");
         loader.loadOBJ(mesh2, "data/meshes/sphere.obj");
 
         // Create the entity tree
         sun = new Entity();
         object1 = new Entity(&mesh1);
         object1->setPosition(vec3(-1, -0.75f, -2));
-        object2 = new Entity(&mesh2);
+        object1->rotateDeg(vec3(1,0,0), 45);
+        object2 = new Entity(&mesh1);
         object2->setPosition(vec3(1.5f, 0, -0.5f));
+        object2->rotateDeg(vec3(0,1,0), 45);
+        object3 = new Entity(&mesh2);
+        object3->setPosition(vec3(0, 0, -2));
         object1->addChild(object2);
+        object1->addChild(object3);
         sun->addChild(object1);
         setRoot(sun);
 

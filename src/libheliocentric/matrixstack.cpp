@@ -30,7 +30,15 @@ float* MatrixStack::array() {
     return value_ptr(ms.top());
 }
 
-MatrixStack& MatrixStack::operator*=(const mat4& matrix) {
+void MatrixStack::apply(const mat4& matrix) {
     ms.top() *= matrix;
+}
+
+void MatrixStack::apply(const quat& quaternion) {
+    apply(glm::mat4_cast(quaternion));
+}
+
+MatrixStack& MatrixStack::operator*=(const mat4& matrix) {
+    apply(matrix);
     return *this;
 }

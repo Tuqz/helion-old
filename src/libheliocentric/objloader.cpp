@@ -136,6 +136,13 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
     // Close the file
     file.close();
 
+    // Check if normals are specified
+    if (normals.size() == 0) {
+        cerr << "Error while parsing \"" << filename << "\"" << endl;
+        cerr << "    No normals in mesh" << endl;
+        return false;
+    }
+    
     // Create the lookup table
     list<IndexPair>* lookup;
     lookup = new list<IndexPair>[nVertices]();
@@ -165,6 +172,7 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
 
     delete [] lookup;
 
+    // Check if enough indices are specified
     if (indices.size() < 3) {
         cerr << "Error while parsing \"" << filename << "\"" << endl;
         cerr << "    No faces in mesh" << endl;

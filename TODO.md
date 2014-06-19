@@ -1,13 +1,16 @@
 Current tasks
 -----
-- [ ] Add entities
+- [x] Add entities
   - [x] Add root node to HcGame3D, and make it update and render the tree
   - [x] Add removeChild and orphanize methods
   - [x] Implement BasicEntity::render()
   - [x] Use matrix stack
-  - [ ] Entity orientation
+  - [x] Entity orientation
   - [ ] Use composition of entities
   - [x] separate model and view
+- Texture support
+  - [ ] In mesh loader
+  - [ ] In renderer
 
 ###Considerations
 *If checked, the consideration is currently implemented, but might be chosen to be changed not to be.*
@@ -18,18 +21,16 @@ Current tasks
 Future tasks
 -----
 - [ ] Make mouse controls more intuitive
+- [ ] Include a camera with a fixed up-direction
 - [ ] Add VSync support
 - [ ] Use VAO's
-- [ ] Handle multiple shader programs
-- Texture support
-  - [ ] In mesh loader
-  - [ ] In renderer
+- [x] Handle multiple shader programs
 - [ ] Mesh scaling
 - [ ] Use impostors for planets, instead of sphere meshes
-- [ ] Include a camera with a fixed up-direction
 - [ ] Have a sun model
 - [ ] Render background
 - [ ] Bump mapping
+- [ ] Include UI (Either write self or use existing)
 - Improve lighting
   - [ ] Multiple light sources
   - [ ] Specular lighting
@@ -44,4 +45,7 @@ Future tasks
   
 Optional tasks
 -----
-- [ ] OBJ loader: Support different lengths for the vertex specification
+- OBJ loader
+  - [ ] Support different lengths for the vertex specification
+  - [ ] Perform triangulation
+  - [ ] Flip winding order

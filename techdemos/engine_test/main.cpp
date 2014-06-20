@@ -8,7 +8,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <math.h>
-        
+
 #define super HcGame3D
 
 using namespace std;
@@ -27,22 +27,51 @@ void printVector(vec3 vector) {
     cout << "pos = (" << vector.x << ", " << vector.y << ", " << vector.z << ")" << endl;
 }
 
+void setLightingUniforms(ShaderProgram& sp) {
+    glUseProgram(sp.getProgram());
+    GLint u;
+    u = sp.getUniformLocation("sunIntensity");
+    glUniform4f(u, 0.9f, 0.9f, 0.9f, 1);
+    u = sp.getUniformLocation("ambientIntensity");
+    glUniform4f(u, 0.1f, 0.1f, 0.1f, 1);
+    u = sp.getUniformLocation("diffuseColor");
+    glUniform4f(u, 1, 1, 1, 1);
+    u = sp.getUniformLocation("attenuationFactor");
+    glUniform1f(u, 1);
+    glUseProgram(0);
+}
+
+void setSunPosition(ShaderProgram& sp, vec4 sunCameraPosition) {
+    glUseProgram(sp.getProgram());
+    glUniform3f(sp.getUniformLocation("sunPosition"), sunCameraPosition.x, sunCameraPosition.y, sunCameraPosition.z);
+    glUseProgram(0);
+}
+
+void setCameraToClipMatrix(ShaderProgram& sp, Camera& cam) {
+    glUseProgram(sp.getProgram());
+    glUniformMatrix4fv(sp.getUniformLocation("cameraToClipMatrix"), 1, GL_FALSE, glm::value_ptr(cam.getCameraToClipMatrix()));
+    glUseProgram(0);
+}
+
 class EngineTest : public HcGame3D {
 private:
-    ShaderProgram sp;
+    ShaderProgram sp1, sp2;
     GLuint vao;
-    GLuint modelToCameraUniform, cameraToClipUniform, sunPositionUniform;
+
+    Mesh mesh1, mesh2, mesh3;
     Entity* sun;
     Entity* object1;
     Entity* object2;
     Entity* object3;
-    Mesh mesh1, mesh2, mesh3;
+
+    GLuint testTexture, testTexSampler, testTexUnit = 0;
 public:
 
     EngineTest(int width, int height, string title, bool resizable,
             bool fullscreen, Camera& camera)
     : HcGame3D(width, height, title, resizable, fullscreen, camera),
-    sp("data/shaders/simple.vert", "data/shaders/simple.frag") {
+    sp1("data/shaders/simple.vert", "data/shaders/simple.frag"),
+    sp2("data/shaders/simple.vert", "data/shaders/texture.frag") {
     }
 
     ~EngineTest() {
@@ -56,40 +85,55 @@ public:
         glfwPollEvents();
         super::init();
 
-        // Transform matrix uniforms
-        modelToCameraUniform = sp.getUniformLocation("modelToCameraMatrix");
-        cameraToClipUniform = sp.getUniformLocation("cameraToClipMatrix");
-        // Lighting uniforms
-        sunPositionUniform = sp.getUniformLocation("sunPosition");
-        glUseProgram(sp.getProgram());
-        GLint u;
-        u = sp.getUniformLocation("sunIntensity");
-        glUniform4f(u, 0.9f, 0.9f, 0.9f, 1);
-        u = sp.getUniformLocation("ambientIntensity");
-        glUniform4f(u, 0.1f, 0.1f, 0.1f, 1);
-        u = sp.getUniformLocation("diffuseColor");
-        glUniform4f(u, 1, 1, 1, 1);
-        u = sp.getUniformLocation("attenuationFactor");
-        glUniform1f(u, 1);
-        glUseProgram(0);
-
         // Create vertex array
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
+        // Set uniforms
+        setLightingUniforms(sp1);
+        setLightingUniforms(sp2);
+        glUseProgram(sp2.getProgram());
+        glUniform1i(sp2.getUniformLocation("testTexture"), testTexUnit);
+        glUseProgram(0);
+
         // Load the mesh
-        ObjLoader loader(sp);
+        ObjLoader loader(sp1);
         loader.loadOBJ(mesh1, "data/meshes/cube2.obj");
         loader.loadOBJ(mesh2, "data/meshes/sphere.obj");
+        ObjLoader loader2(sp2);
+        loader2.loadOBJ(mesh3, "data/meshes/cube2.obj");
+
+        // Create test texture
+        GLsizei texSize = 256;
+        vector<GLubyte> textureData;
+        for (int j = 0; j < texSize; j++) {
+            for (int i = 0; i < texSize; i++) {
+                float x = cos(4 * M_PI / texSize * i) / 2.0f + 0.5f;
+                float y = sin(4 * M_PI / texSize * j);
+                textureData.push_back((GLubyte) (0.5f+0.5f*(x * y * y)*255.0f));
+            }
+        }
+        glGenTextures(1, &testTexture);
+        glBindTexture(GL_TEXTURE_2D, testTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, texSize, texSize, 0,
+                GL_RED, GL_UNSIGNED_BYTE, &textureData[0]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glGenSamplers(1, &testTexSampler);
+        glSamplerParameteri(testTexSampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glSamplerParameteri(testTexSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glSamplerParameteri(testTexSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
 
         // Create the entity tree
         sun = new Entity();
-        object1 = new Entity(&mesh1);
+        object1 = new Entity(&mesh3);
         object1->setPosition(vec3(-1, -0.75f, -2));
-        object1->rotateDeg(vec3(1,0,0), 45);
+        object1->rotateDeg(vec3(1, 0, 0), 45);
         object2 = new Entity(&mesh1);
         object2->setPosition(vec3(1.5f, 0, -0.5f));
-        object2->rotateDeg(vec3(0,1,0), 45);
+        object2->rotateDeg(vec3(0, 1, 0), 45);
         object3 = new Entity(&mesh2);
         object3->setPosition(vec3(0, 0, -2));
         object1->addChild(object2);
@@ -157,22 +201,23 @@ public:
     }
 
     void renderWorld(mat4 base) {
-        glUseProgram(sp.getProgram());
-
         vec4 sunCameraPosition = base * vec4(0, 0, 0, 1);
-        glUniform3f(sunPositionUniform, sunCameraPosition.x, sunCameraPosition.y, sunCameraPosition.z);
-
-        glUseProgram(0);
+        setSunPosition(sp1, sunCameraPosition);
+        setSunPosition(sp2, sunCameraPosition);
+        glActiveTexture(GL_TEXTURE0 + testTexUnit);
+        glBindTexture(GL_TEXTURE_2D, testTexture);
+        glBindSampler(testTexUnit, testTexSampler);
     }
 
     void renderHUD(mat4 base) {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindSampler(testTexUnit, 0);
     }
 
     void resized(int width, int height) {
         super::resized(width, height);
-        glUseProgram(sp.getProgram());
-        glUniformMatrix4fv(cameraToClipUniform, 1, GL_FALSE, glm::value_ptr(getCamera().getCameraToClipMatrix()));
-        glUseProgram(0);
+        setCameraToClipMatrix(sp1, getCamera());
+        setCameraToClipMatrix(sp2, getCamera());
     }
 };
 

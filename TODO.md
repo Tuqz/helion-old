@@ -1,16 +1,10 @@
 Current tasks
 -----
-- [x] Add entities
-  - [x] Add root node to HcGame3D, and make it update and render the tree
-  - [x] Add removeChild and orphanize methods
-  - [x] Implement BasicEntity::render()
-  - [x] Use matrix stack
-  - [x] Entity orientation
-  - [ ] Use composition of entities
-  - [x] separate model and view
-- Texture support
-  - [ ] In mesh loader
-  - [ ] In renderer
+- [ ] Texture support
+  - [ ] Image loading
+  - [ ] Texture class
+  - [ ] Shader support
+  - [ ] How to combine with meshes?
 
 ###Considerations
 *If checked, the consideration is currently implemented, but might be chosen to be changed not to be.*
@@ -20,6 +14,7 @@ Current tasks
 
 Future tasks
 -----
+- [ ] Documentation
 - [ ] Make mouse controls more intuitive
 - [ ] Include a camera with a fixed up-direction
 - [ ] Add VSync support
@@ -31,6 +26,7 @@ Future tasks
 - [ ] Render background
 - [ ] Bump mapping
 - [ ] Include UI (Either write self or use existing)
+- [ ] Use composition of entities
 - Improve lighting
   - [ ] Multiple light sources
   - [ ] Specular lighting

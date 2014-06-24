@@ -58,7 +58,7 @@ private:
     ShaderProgram sp1, sp2;
     GLuint vao;
 
-    Mesh mesh1, mesh2, mesh3;
+    Mesh mesh;
     Entity* sun;
     Entity* object1;
     Entity* object2;
@@ -71,7 +71,7 @@ public:
             bool fullscreen, Camera& camera)
     : HcGame3D(width, height, title, resizable, fullscreen, camera),
     sp1("data/shaders/simple.vert", "data/shaders/simple.frag"),
-    sp2("data/shaders/simple.vert", "data/shaders/texture.frag") {
+    sp2("data/shaders/texture.vert", "data/shaders/texture.frag") {
     }
 
     ~EngineTest() {
@@ -82,6 +82,7 @@ public:
     }
 
     void init() {
+        glClearColor(0.2f,0.2f,0.2f,1);
         glfwPollEvents();
         super::init();
 
@@ -97,20 +98,17 @@ public:
         glUseProgram(0);
 
         // Load the mesh
-        ObjLoader loader(sp1);
-        loader.loadOBJ(mesh1, "data/meshes/cube2.obj");
-        loader.loadOBJ(mesh2, "data/meshes/sphere.obj");
-        ObjLoader loader2(sp2);
-        loader2.loadOBJ(mesh3, "data/meshes/cube2.obj");
+        ObjLoader loader(sp2);
+        loader.loadOBJ(mesh, "data/meshes/sphere2.obj");
 
         // Create test texture
         GLsizei texSize = 256;
         vector<GLubyte> textureData;
         for (int j = 0; j < texSize; j++) {
             for (int i = 0; i < texSize; i++) {
-                float x = cos(4 * M_PI / texSize * i) / 2.0f + 0.5f;
-                float y = sin(4 * M_PI / texSize * j);
-                textureData.push_back((GLubyte) (0.5f+0.5f*(x * y * y)*255.0f));
+                float x = cos(2 * M_PI / texSize * i) / 2.0f + 0.5f;
+                float y = sin(2 * M_PI / texSize * j);
+                textureData.push_back((GLubyte)((x*y*y)*255.0f));
             }
         }
         glGenTextures(1, &testTexture);
@@ -128,17 +126,18 @@ public:
 
         // Create the entity tree
         sun = new Entity();
-        object1 = new Entity(&mesh3);
-        object1->setPosition(vec3(-1, -0.75f, -2));
-        object1->rotateDeg(vec3(1, 0, 0), 45);
-        object2 = new Entity(&mesh1);
-        object2->setPosition(vec3(1.5f, 0, -0.5f));
-        object2->rotateDeg(vec3(0, 1, 0), 45);
-        object3 = new Entity(&mesh2);
+//        object1 = new Entity(&mesh1);
+//        object1->setPosition(vec3(-1, -0.75f, -2));
+//        object1->rotateDeg(vec3(1, 0, 0), 45);
+//        object2 = new Entity(&mesh1);
+//        object2->setPosition(vec3(1.5f, 0, -0.5f));
+//        object2->rotateDeg(vec3(0, 1, 0), 45);
+        object3 = new Entity(&mesh);
         object3->setPosition(vec3(0, 0, -2));
-        object1->addChild(object2);
-        object1->addChild(object3);
-        sun->addChild(object1);
+//        object1->addChild(object2);
+//        object1->addChild(object3);
+//        sun->addChild(object1);
+        sun->addChild(object3);
         setRoot(sun);
 
         // Grab the mouse to control the camera

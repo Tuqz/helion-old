@@ -3,12 +3,12 @@
 // Inputs
 in vec3 cameraSpacePosition;
 in vec3 vertexNormal;
+in vec2 texCoords;
 
 // Lighting parameters
 uniform vec3 sunPosition;
 uniform vec4 sunIntensity;
 uniform vec4 ambientIntensity;
-uniform vec4 diffuseColor;
 uniform float attenuationFactor;
 
 // Textures
@@ -32,13 +32,11 @@ void main()
     vec4 attenIntensity = applyLightIntensity(cameraSpacePosition, dirToSun);
     float cosAI_sun = clamp(dot(vertexNormal, dirToSun), 0, 1);
 
-	vec2 texCoord;
-	texCoord.s = cameraSpacePosition.x;
-	texCoord.t = cameraSpacePosition.y;
-	float c = texture(testTexture, texCoord).r;
-	vec4 diffuseColor2 = diffuseColor + vec4(c, -c, -c, 0);
+	vec4 diffuseColor = texture(testTexture, texCoords);
+	//vec4 diffuseColor = vec4(texCoords,0,1);
 
     // Output including ambient and diffuse lighting
-    outputColor = diffuseColor2 * ambientIntensity
-            + diffuseColor2 * attenIntensity * cosAI_sun;
+    //outputColor = diffuseColor * ambientIntensity
+    //        + diffuseColor * attenIntensity * cosAI_sun;
+	outputColor = diffuseColor;
 }

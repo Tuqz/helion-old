@@ -65,9 +65,10 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
     vector<string> tokens;
     vector<string> tokens2;
     vector<float> vertices;
+    vector<float> texCoords;
     vector<float> normals;
     vector<unsigned short> vIndices;
-    //vector<unsigned short> tIndices;
+    vector<unsigned short> tIndices;
     vector<unsigned short> nIndices;
     int nVertices = 0;
     int lineNumber = 0;
@@ -91,6 +92,16 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
                     vertices.push_back(atof(tokens[i].c_str()));
                     nVertices++;
                 }
+            } else if (tokens.front().compare("vt") == 0) {
+                if (tokens.size() != 3) {
+                    cerr << "Error while parsing \"" << filename << "\"" << endl;
+                    cerr << "    Expected 2D texture coordinates in line "
+                            << lineNumber << ": \"" << line << "\"" << endl;
+                    return false;
+                }
+                for (int i = 1; i < tokens.size(); i++) {
+                    texCoords.push_back(atof(tokens[i].c_str()));
+                }
             } else if (tokens.front().compare("vn") == 0) {
                 if (tokens.size() != 4) {
                     cerr << "Error while parsing \"" << filename << "\"" << endl;
@@ -112,15 +123,15 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
                     tokens2 = tokenize(tokens[i], '/', true);
                     if (tokens2.size() == 3) {
                         vIndices.push_back(atoi(tokens2[0].c_str()));
-                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        tIndices.push_back(atoi(tokens2[1].c_str()));
                         nIndices.push_back(atoi(tokens2[2].c_str()));
                     } else if (tokens2.size() == 2) {
                         vIndices.push_back(atoi(tokens2[0].c_str()));
-                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        tIndices.push_back(atoi(tokens2[1].c_str()));
                         nIndices.push_back(atoi(tokens2[0].c_str()));
                     } else if (tokens2.size() == 1) {
                         vIndices.push_back(atoi(tokens2[0].c_str()));
-                        //tIndices.push_back(atoi(tokens2[1].c_str()));
+                        tIndices.push_back(atoi(tokens2[0].c_str()));
                         nIndices.push_back(atoi(tokens2[0].c_str()));
                     } else {
                         cerr << "Error while parsing \"" << filename << "\"" << endl;
@@ -142,35 +153,47 @@ bool ObjLoader::loadOBJ(Mesh& mesh, const string& filename) {
         cerr << "    No normals in mesh" << endl;
         return false;
     }
-    
+
     // Create the lookup table
-    list<IndexPair>* lookup;
-    lookup = new list<IndexPair>[nVertices]();
+//    list<IndexPair>* lookup;
+//    lookup = new list<IndexPair>[nVertices]();
 
     // Fill the actual vertex data array
     unsigned short nextIndex = 0;
-    int index, vIndex, nIndex;
-    list<IndexPair>* l;
+    int index, vIndex, nIndex, tcIndex;
+//    list<IndexPair>* l;
     for (int i = 0; i < vIndices.size(); i++) {
         vIndex = vIndices[i] - 1;
+        tcIndex = tIndices[i] - 1;
         nIndex = nIndices[i] - 1;
-        l = &lookup[vIndex];
-        index = getIndex(l, nIndex);
-        if (index == -1) {
+//        l = &lookup[vIndex];
+//        index = getIndex(l, nIndex);
+//        if (index == -1) {
             vertexData.push_back(vertices[vIndex * 3]);
             vertexData.push_back(vertices[vIndex * 3 + 1]);
             vertexData.push_back(vertices[vIndex * 3 + 2]);
             vertexData.push_back(normals[nIndex * 3]);
             vertexData.push_back(normals[nIndex * 3 + 1]);
             vertexData.push_back(normals[nIndex * 3 + 2]);
+            vertexData.push_back(texCoords[tcIndex * 2]);
+            vertexData.push_back(texCoords[tcIndex * 2 + 1]);
             index = nextIndex;
-            l->push_back({nIndex, index});
+//            l->push_back({nIndex, index});
             nextIndex++;
-        }
+//        }
         indices.push_back(index);
     }
 
-    delete [] lookup;
+//    delete [] lookup;
+
+    
+//    for (int i = 0; i < vertexData.size(); i += 8) {
+//        while (i < 8) {
+//            cout << vertexData[i] << " ";
+//            i++;
+//        }
+//        cout << endl;
+//    }
 
     // Check if enough indices are specified
     if (indices.size() < 3) {

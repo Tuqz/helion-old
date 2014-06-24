@@ -3,7 +3,10 @@ Current tasks
 - [ ] Texture support
   - [ ] Image loading
   - [ ] Texture class
-  - [ ] Shader support
+  - [ ] Mesh loading
+    - [x] vt support
+    - [ ] Restore lookup table 
+  - [x] Shader support
   - [ ] How to combine with meshes?
 
 ###Considerations

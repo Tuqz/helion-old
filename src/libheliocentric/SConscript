@@ -1,0 +1,12 @@
+import glob
+
+Import("env", "mode", "debugcppflags", "releasecppflags")
+localenv = env.Clone()
+
+target = "heliocentric"
+srcs = glob.glob("*.cpp")
+libraries = ["GL", "GLEW", "m"]
+if mode == "debug":
+	localenv.SharedLibrary(target = target, source = srcs, LIBS=libraries, CCFLAGS=debugcppflags)
+else:
+	localenv.SharedLibrary(target = target, source = srcs, LIBS=libraries, CCFLAGS=releasecppflags)

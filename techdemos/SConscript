@@ -1,0 +1,26 @@
+import os 
+import glob
+
+Import("env", "mode", "debugcppflags", "releasecppflags")
+localenv = env.Clone()
+
+files = os.listdir(".")
+folders = []
+for file in files:
+	if os.path.isdir(file):
+		folders.append(file)
+
+for folder in folders:
+	print("Building techdemo: "+folder)
+	libs = open(folder+"/libs.txt", "r")
+	needed_libs = ["libheliocentric"]
+	for line in libs:
+		needed_libs.append(line)
+	libs.close()
+	srcs = glob.glob(folder+"/*.cpp")
+	heliocentric = "../src/libheliocentric/"
+	
+	if mode == "debug":
+		localenv.Program(target = folder+folder, source = srcs, LIBS = needed_libs, CCFLAGS=debugcppflags, CPPPATH=heliocentric, LIBPATH=heliocentric)
+	else:
+		localenv.Program(target = folder+folder, source = srcs, LIBS = needed_libs, CCFLAGS=releasecppflags, CPPPATH=heliocentric, LIBPATH=heliocentric)

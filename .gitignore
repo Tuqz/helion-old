@@ -1,5 +1,6 @@
 *.cmake
 *.a
+*.os
 Makefile
 CMakeFiles/
 CMakeCache.txt
